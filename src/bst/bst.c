@@ -12,7 +12,6 @@ struct bst{
 };
 
 //functions
-
 static bst *BST_malloc(void *key,tree_operations *ops)
 {
   bst *new_node = malloc(sizeof(*new_node));
