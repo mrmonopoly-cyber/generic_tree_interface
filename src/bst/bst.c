@@ -2,6 +2,11 @@
 
 #include "bst.h"
 
+
+//debug
+
+#include <stdio.h>
+
 //private
 
 //data structure 
@@ -42,6 +47,10 @@ int BST_insert(bst **root,void *key,tree_operations *ops)
 
 int BST_delete(bst **root,void *key)
 {
+  //removing an element not in the tree
+  if(*root == NULL){
+    return -1;
+  }
   bst *node = *root;
   //searching node
   int is_greater = node->operations->compare_key(node->key,key);
@@ -50,7 +59,7 @@ int BST_delete(bst **root,void *key)
   }else if(is_greater <0){
     return BST_delete(&node->children[0],key);
   }
-  //find it
+  //found it
   
   //leaf node
   if(node->children[0]==NULL && node->children[1]==NULL){
@@ -141,9 +150,17 @@ void BST_in_order_visit(bst *root)
     BST_in_order_visit(root->children[1]);
   }
 }
+void BST_pre_order_visit(bst *root)
+{
+  if(root!=NULL){
+    void *key=root->key;
+    root->operations->print_key(key);
+    BST_pre_order_visit(root->children[0]);
+    BST_pre_order_visit(root->children[1]);
+  }
+}
 //debug
 
-#include <stdio.h>
 int compare_key(void *data1,void *data2)
 {
   int int_data1 = *(int *) data1;
@@ -167,30 +184,25 @@ int main(int argc, char *argv[])
 {
   tree_operations *env;
   bst *root=NULL;
-
+  int dati[] = {10,20,5,2,7,1,4,3,6,9,8,15,13,18,30,29,31};
+  int num_el = sizeof(dati) / sizeof(dati[0]);
+  int rm[] = {10,5,2,13,40,6,1};
+  int rm_len = sizeof(rm) / sizeof(rm[0]);
   env = create_environment(compare_key,NULL,print_key);
-  int key1 = 1;
-  int key2 = 2;
-  int key4 = 4;
-
-  printf("empty tree\n");
-  BST_in_order_visit(root);
-  printf("with one insertion\n");
-  BST_insert(&root,(void *) &key1,env);
-  BST_in_order_visit(root);
-
-  printf("with two insertion\n");
-  BST_insert(&root,(void *) &key2,env);
-  BST_in_order_visit(root);
-
-  printf("with one instertion and one deletion insertion\n");
-  BST_delete(&root,(void *)&key2);
-  BST_in_order_visit(root);
-
-  printf("reinsertion after deliting\n");
-  BST_insert(&root,(void *) &key4,env);
-  BST_in_order_visit(root);
-
   
+  //insert
+  for (int i=0;i<num_el;++i) {
+    BST_insert(&root,(void *) &dati[i],env);
+  }
+  printf("dopo tutti gli inserimenti\n");
+  BST_pre_order_visit(root);
+
+  //delete
+  for (int j=0;j<rm_len;++j) {
+    BST_delete(&root,(void *)&rm[j]);
+  }
+  printf("dopo tutte le eliminazioni\n");
+  BST_pre_order_visit(root);
+ 
   return EXIT_SUCCESS;
 }

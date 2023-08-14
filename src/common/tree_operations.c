@@ -3,16 +3,14 @@
 #include "tree_operations.h"
 //private
 
-struct common_node {
-  struct commond_node *children;
-  void *key;
-};
 //functions
-static void swap_keys(void ** key1,void **key2)
+static void swap_keys(void **node1,void **node2)
 {
-  void *temp=*key1;
-  key1=key2;
-  key2=&temp;
+  char *c1 = *(char **) node1;
+  char *c2 = *(char **) node2;
+  char *tc = c1;
+  *node1 = c2;
+  *node2 = tc;
 }
 
 static void in_order_visit_bin(void *root)
