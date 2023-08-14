@@ -13,20 +13,46 @@ struct bst{
   struct tree_operations *operations;
 };
 
+//functions
 
+bst *BST_malloc(void *key,bst *parent)
+{
+  bst *new_node = malloc(sizeof(*new_node));
+  new_node->key=key;
+  if(parent!=NULL){
+    new_node->parent=parent;
+  }
+  new_node->childs[0]=NULL;
+  new_node->childs[1]=NULL;
+  return new_node;
+}
+
+void BST_unlink(bst *parent,bst *to_delete)
+{
+  if(parente->childs[0] != NULL && parente->childs[0] == to_delete){
+    parente->childs[0]=NULL;
+  }else {
+    parente->childs[1]=NULL;
+  }
+}
 //public
 int BST_insert(bst **root,void *key)
 {
   if(*root==NULL){
-    (*root)=malloc(sizeof(**root));
-    (*root)->key=key;
-    (*root)->parent = NULL;
+    *root=BST_malloc(key,NULL);
+    return 0;
   }
 
   int is_greater = (*root)->operations->compare_key((*root)->key,key);
-
+  bst *new_node=NULL;
   if(is_greater >= 0){
+    if((*root)->childs[0] == NULL){
+      (*root)->childs[0]=BST_malloc(key,(*root));
+    }
     return BST_insert(&(*root)->childs[0],key);
+  }
+  if((*root)->childs[1] == NULL){
+    (*root)->childs[1]=BST_malloc(key,(*root));
   }
   return BST_insert(&(*root)->childs[1],key);
 
@@ -36,22 +62,42 @@ int BST_insert(bst **root,void *key)
 int BST_delete(bst **root,void *key)
 {
   bst *to_delete = BST_search(root,key);
-  bst *to_delete_parent;
-  bst *to_delete_child_0;
-  bst *to_delete_child_1;
-  if(to_delete==NULL){
-    return -1;
+  bst *to_delete_parent = to_delete->parent;
+  bst *candidate;
+  
+  //leaf node
+  if(to_delete->childs[0]==NULL && to_delete->childs[1] == NULL){
+    BST_unlink(to_delete_parent,to_delete);
+    BST_free(to_delete);
+    return 0;
   }
   
-  to_delete_parent = to_delete->parent;
-  to_delete_child_0 = to_delete->childs[0];
-  to_delete_child_1 = to_delete->childs[1];
-
-  if(to_delete_child_0==NULL && to_delete_child_1 == NULL){
-    BST_free(&to_delete);
+  //middle node
+  candidate = (*root)->operations->min((*root)->childs[1]);
+  if(candidate==NULL){
+    candidate = (*root)->operations->max((*root)->childs[0]);
   }
-
-  
+  if(candidate !=NULL){
+    (*root)->operations->swap_keys(to_delete,candidate);
+    BST_unlink(candidate->parent,candidate);
+    BST_free(candidate);
+    return 0;
+  }
+  // double NULL case, need rotation
+  candidate = (*root)->operations->min((*root));
+  if(candidate==NULL){
+    candidate = (*root)->operations->max((*root));
+  }
+  (*root)->operations->swap_keys(candidate->parent,candidate);
+  bst *candidate_parent_childs = candidate->parente->childs;
+  if(candidate_parent_childs[0]!=NULL && candidate_parent_childs[0]==candidate){
+    candidate_parent_childs[1]=candidate;
+    candidate_parent_childs[0]=NULL;
+  }else {
+    candidate_parent_childs[0]=candidate;
+    candidate_parent_childs[1]=NULL;
+  }
+  BST_delete(&to_delete,key);
   return 0;
 }
 
@@ -78,17 +124,16 @@ bst *BST_search(bst **root,void *key)
 
 void BST_free(bst **root)
 {
-  if(*root!=NULL){
-    bst *temp = (*root);
-    BST_free(&temp->childs[0]);
-    BST_free(&temp->childs[1]);
+  if(root!=NULL){
+    BST_free(root->childs[0]);
+    BST_free(root->childs[1]);
 
-    if(temp->key!=NULL && temp->operations->free_data!=NULL){
-      temp->operations->free_data(temp->key);
-      temp->key=NULL;
+    if(root->key!=NULL && root->operations->free_data!=NULL){
+      root->operations->free_data(root->key);
+      root->key=NULL;
     }
-    free(temp);
-    *root=NULL;
+    free(root);
+    root=NULL;
   }
 }
 
