@@ -2,11 +2,6 @@
 
 #include "bst.h"
 
-
-//debug
-
-#include <stdio.h>
-
 //private
 
 //data structure 
@@ -140,26 +135,9 @@ void BST_free(bst *root)
   }
 }
 
-
-void BST_in_order_visit(bst *root)
-{
-  if(root!=NULL){
-    BST_in_order_visit(root->children[0]);
-    void *key=root->key;
-    root->operations->print_key(key);
-    BST_in_order_visit(root->children[1]);
-  }
-}
-void BST_pre_order_visit(bst *root)
-{
-  if(root!=NULL){
-    void *key=root->key;
-    root->operations->print_key(key);
-    BST_pre_order_visit(root->children[0]);
-    BST_pre_order_visit(root->children[1]);
-  }
-}
 //debug
+
+#include <stdio.h>
 
 int compare_key(void *data1,void *data2)
 {
@@ -195,14 +173,14 @@ int main(int argc, char *argv[])
     BST_insert(&root,(void *) &dati[i],env);
   }
   printf("dopo tutti gli inserimenti\n");
-  BST_pre_order_visit(root);
+  binary_pre_order_visit(root);
 
   //delete
   for (int j=0;j<rm_len;++j) {
     BST_delete(&root,(void *)&rm[j]);
   }
   printf("dopo tutte le eliminazioni\n");
-  BST_pre_order_visit(root);
+  binary_pre_order_visit(root);
  
   return EXIT_SUCCESS;
 }
