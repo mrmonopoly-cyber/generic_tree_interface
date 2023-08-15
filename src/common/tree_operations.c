@@ -3,14 +3,9 @@
 #include "tree_operations.h"
 //private
 
-typedef struct common_tree {
-  void *key;
-  struct common_tree **children;
-  tree_operations *operations;
-}common_tree;
-
 //functions
-static void swap_keys(void **node1,void **node2)
+//public
+void swap_keys(void **node1,void **node2)
 {
   char *c1 = *(char **) node1;
   char *c2 = *(char **) node2;
@@ -41,7 +36,6 @@ void binary_pre_order_visit(void *root)
   }
 }
 
-//public
 struct tree_operations *create_environment(int (*compare_key) (void *,void*),
                                     void (*free_data) (void *),
                                     void (*print_key) (void *))
@@ -49,7 +43,6 @@ struct tree_operations *create_environment(int (*compare_key) (void *,void*),
   struct tree_operations *ops=malloc(sizeof(*ops));
   ops->compare_key=compare_key;
   ops->free_data=free_data;
-  ops->swap_keys=swap_keys;
   ops->print_key=print_key;
   return ops;
 }
