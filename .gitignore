@@ -51,5 +51,4 @@ m4/lt~obsolete.m4
 # (which is called by configure script))
 Makefile
 
-./tests/bst/test_bst
-./tests/rbt/test_rbt
+tests
