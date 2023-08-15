@@ -27,6 +27,9 @@ int BST_malloc(bst **root,void *key,tree_operations *ops)
 //public
 int BST_insert(bst **root,void *key,tree_operations *ops)
 {
+  if(bst==NULL){
+    return -2;
+  }
   if(*root==NULL){
     return BST_malloc(root,key,ops);
   }
