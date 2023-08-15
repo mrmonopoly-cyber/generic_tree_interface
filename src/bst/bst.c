@@ -12,21 +12,23 @@ struct bst{
 };
 
 //functions
-static bst *BST_malloc(void *key,tree_operations *ops)
+int BST_malloc(bst **root,void *key,tree_operations *ops)
 {
-  bst *new_node = malloc(sizeof(*new_node));
-  new_node->key=key;
-  new_node->children=malloc(sizeof(*new_node->children));
-  new_node->operations=ops;
-  return new_node;
+  *root=malloc(sizeof(**root));
+  if(*root == NULL){
+    return -1;
+  }
+  (*root)->key=key;
+  (*root)->children=malloc(2*sizeof(*(*root)->children));
+  (*root)->operations=ops;
+  return 0;
 }
 
 //public
 int BST_insert(bst **root,void *key,tree_operations *ops)
 {
   if(*root==NULL){
-    *root=BST_malloc(key,ops);
-    return 0;
+    return BST_malloc(root,key,ops);
   }
 
   int is_greater = (*root)->operations->compare_key((*root)->key,key);
@@ -57,7 +59,7 @@ int BST_delete(bst **root,void *key)
   
   //leaf node
   if(node->children[0]==NULL && node->children[1]==NULL){
-    BST_free(node);
+    BST_free(*root);
     *root=NULL;
     return 0;
   }
@@ -98,42 +100,14 @@ int BST_delete(bst **root,void *key)
   return 0;
 }
 
-bst *BST_search(bst **root,void *key)
-{
-  if(*root!=NULL){
-    bst *temp = (*root);
-    int is_greater = temp->operations->compare_key(temp->key,key);
-
-    switch (is_greater) {
-      case 0:
-        return temp;
-        break;
-      case 1:
-        return BST_search(&temp->children[0],key);
-        break;
-      case -1:
-        return BST_search(&temp->children[1],key);
-        break;
-    }
-  }
-  return NULL;
-}
-
 void BST_free(bst *root)
 {
   if(root!=NULL){
-    BST_free(root->children[0]);
-    BST_free(root->children[1]);
-
-    if(root->key!=NULL && root->operations->free_data!=NULL){
-      root->operations->free_data(root->key);
-      root->key=NULL;
-    }
+    binary_free(root);
     free(root);
     root=NULL;
   }
 }
-
 //debug
 
 #include <stdio.h>
@@ -180,6 +154,9 @@ int main(int argc, char *argv[])
   }
   printf("dopo tutte le eliminazioni\n");
   binary_pre_order_visit(root);
- 
+  
+  BST_free(root);
+  root=NULL;
+  binary_pre_order_visit(root);
   return EXIT_SUCCESS;
 }
