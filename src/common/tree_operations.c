@@ -14,17 +14,6 @@ void swap_keys(void **node1,void **node2)
   *node2 = tc;
 }
 
-void binary_in_order_visit(void *root)
-{
-  common_tree *t=(common_tree *)root;
-  if(t!=NULL){
-    binary_in_order_visit((void *)t->children[0]);
-    void *key=t->key;
-    t->operations->print_key(key);
-    binary_in_order_visit((void *)t->children[1]);
-  }
-}
-
 void binary_pre_order_visit(void *root)
 {
   common_tree *t=(common_tree *)root;
@@ -36,6 +25,27 @@ void binary_pre_order_visit(void *root)
   }
 }
 
+void binary_in_order_visit(void *root)
+{
+  common_tree *t=(common_tree *)root;
+  if(t!=NULL){
+    binary_in_order_visit((void *)t->children[0]);
+    void *key=t->key;
+    t->operations->print_key(key);
+    binary_in_order_visit((void *)t->children[1]);
+  }
+}
+
+void binary_post_order_visit(void *root)
+{
+  common_tree *t=(common_tree *)root;
+  if(t!=NULL){
+    void *key=t->key;
+    binary_pre_order_visit((void *)t->children[0]);
+    binary_pre_order_visit((void *)t->children[1]);
+    t->operations->print_key(key);
+  }
+}
 struct tree_operations *create_environment(int (*compare_key) (void *,void*),
                                     void (*free_data) (void *),
                                     void (*print_key) (void *))
