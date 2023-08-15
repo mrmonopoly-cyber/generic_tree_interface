@@ -27,7 +27,18 @@ int RBT_malloc(rbt **root,void *key,tree_operations *ops,char colour)
 //public
 int RBT_insert(rbt **root,void *key,tree_operations *ops)
 {
+  if(root==NULL){
+    goto NULL_pointer;
+  }
+  if(*root==NULL){
+    return RBT_malloc(root,key,ops,0);
+  }
   return 0;
+  
+  //exceptions
+  NULL_pointer:
+    return -2;
+
 }
 
 int RBT_delete(rbt **root,void *key)
