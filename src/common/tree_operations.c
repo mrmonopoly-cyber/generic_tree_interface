@@ -54,3 +54,37 @@ struct tree_operations *create_environment(int (*compare_key) (void *,void*),
   return ops;
 }
 
+void *binary_search(void *root,void *key)
+{
+  common_tree *temp = (common_tree *)root;
+  if(temp!=NULL){
+    int is_greater = temp->operations->compare_key(temp->key,key);
+
+    switch (is_greater) {
+      case 0:
+        return temp;
+        break;
+      case 1:
+        return binary_search(&temp->children[0],key);
+        break;
+      case -1:
+        return binary_search(&temp->children[1],key);
+        break;
+    }
+  }
+  return NULL;
+}
+
+void binary_free(void *root)
+{
+  if(root!=NULL){
+    common_tree *temp = (common_tree *)root;
+    binary_free(temp->children[0]);
+    binary_free(temp->children[1]);
+
+    if(temp->key!=NULL && temp->operations->free_data!=NULL){
+      temp->operations->free_data(temp->key);
+      temp->key=NULL;
+    }
+  }
+}

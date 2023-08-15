@@ -15,4 +15,7 @@ tree_operations *create_environment(int (*compare_key) (void *,void*),
 
 void binary_in_order_visit(void *root);
 void binary_pre_order_visit(void *root);
+void *binary_search(void *root,void *key);
+void binary_free(void *root);
+
 #endif // _TREE_OPERATIONS_
