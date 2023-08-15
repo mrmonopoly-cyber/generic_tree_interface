@@ -73,7 +73,7 @@ int BST_delete(bst **root,void *key)
       successor_parent=successor;
       successor=successor->children[0];
     }
-    node->operations->swap_keys(&node->key,&successor->key);
+    swap_keys(&node->key,&successor->key);
     if(greater_child == successor){
       node->children[1]=successor->children[1];
       successor->children[1]=NULL;
@@ -90,7 +90,7 @@ int BST_delete(bst **root,void *key)
   if(node->children[0]==NULL){
     child=node->children[1];
   }
-  node->operations->swap_keys(&node->key,&child->key);
+  swap_keys(&node->key,&child->key);
   node->children[0]=child->children[0];
   node->children[1]=child->children[1];
   child->children[0]=NULL;
