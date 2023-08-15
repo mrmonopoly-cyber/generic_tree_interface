@@ -10,5 +10,9 @@ int RBT_insert(rbt **root,void *key,tree_operations *ops);
 #define RBT_search(R,K) binary_search(R,K)
 int RBT_delete(rbt **root,void *key);
 void RBT_free(rbt *root);
+#define RBT_in_order_visit(R) binary_in_order_visit(R)
+#define RBT_pre_order_visit(R) binary_pre_order_visit(R)
+#define RBT_environment(CK,FD,PK) create_environment(CK,FD,PK)
+
 
 #endif // !_RBT_
