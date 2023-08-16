@@ -4,15 +4,17 @@
 
 //private
 
+enum COLOUR{BLACK,RED };
+
 typedef struct rbt {
   void *key;
   struct rbt **children;
   tree_operations *operations;
-  unsigned char colour:1;
+  enum COLOUR colour;
 }rbt;
 
 //functions
-int RBT_malloc(rbt **root,void *key,tree_operations *ops,char colour)
+static int RBT_malloc(rbt **root,void *key,tree_operations *ops,enum COLOUR colour)
 {
   (*root)=malloc(sizeof(**root));
   if(*root!=NULL){
@@ -31,7 +33,7 @@ int RBT_insert(rbt **root,void *key,tree_operations *ops)
     goto NULL_pointer;
   }
   if(*root==NULL){
-    return RBT_malloc(root,key,ops,0);
+    return RBT_malloc(root,key,ops,BLACK);
   }
   return 0;
   

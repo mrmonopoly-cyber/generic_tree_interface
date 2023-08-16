@@ -1,6 +1,10 @@
 #ifndef _TREE_OPERATIONS_
 #define _TREE_OPERARIONS_
 
+enum ROTATION_DIRECTION {
+  LEFT=0,
+  RIGHT=1
+};
 
 typedef struct tree_operations tree_operations;
 struct tree_operations {
@@ -23,6 +27,8 @@ tree_operations *create_environment(int (*compare_key) (void *,void*),
 void binary_pre_order_visit(void *root);
 void binary_in_order_visit(void *root);
 void binary_post_order_visit(void *root);
+
+int binary_rotation(void **root,enum ROTATION_DIRECTION direction);
 
 void *binary_search(void *root,void *key);
 void binary_free(void *root);
