@@ -6,7 +6,8 @@
 typedef struct rbt rbt;
 
 
-int RBT_insert(rbt **root,void *key,tree_operations *ops);
+int RBT_insert_full(rbt **root,void *key,rbt *parent,tree_operations *ops);
+#define RBT_insert(root,key,ops) RBT_insert_full(root,key,NULL,ops);
 #define RBT_search(R,K) binary_search(R,K)
 int RBT_delete(rbt **root,void *key);
 void RBT_free(rbt *root);
