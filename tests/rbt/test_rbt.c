@@ -35,7 +35,6 @@ int main(int argc, char *argv[])
   for (int i=0;i<num_el;++i) {
     RBT_insert(&root,(void *) &dati[i],env);
   }
-  // binary_rotation((void **)&root,RIGHT);
   printf("dopo tutti gli inserimenti\n");
   printf("pre_order visit\n");
   RBT_pre_order_visit(root);
