@@ -7,9 +7,11 @@
 
 void swap_child(common_tree **node1,int child1, common_tree **node2,int child2)
 {
-  common_tree *temp = (*node1)->children[child1];
+  common_tree *child1_p=(*node1)->children[child1];
+  common_tree *child2_p=(*node2)->children[child2];
+  common_tree *temp=child1_p;
 
-  (*node1)->children[child1]=(*node2)->children[child2];
+  (*node1)->children[child1]=child2_p;
   (*node2)->children[child2]=temp;
 }
 
@@ -60,57 +62,21 @@ void binary_post_order_visit(void *root)
 
 int binary_rotation(void **root, enum ROTATION_DIRECTION direction)
 {
-  common_tree *conv_root = *(common_tree **) root;
-  common_tree *to_swap = conv_root->children[0];
-  common_tree *temp;
   int which_child=1;
+  common_tree *conv_root = *(common_tree **) root;
+  common_tree *to_swap;
 
   if(direction==RIGHT){
-    to_swap = (conv_root)->children[1];
     which_child=0;
   }
 
-  swap_keys((void *)conv_root,(void *)to_swap);
-
-  // swap_child(conv_root,0,conv_root,1);
-  temp=(conv_root)->children[0];
-  conv_root->children[0]=conv_root->children[1];
-  conv_root->children[1]=temp;
-  temp=NULL;
-  
-  // swap_child(conv_root,0,to_swap,0);
-  // swap_child(conv_root,0,to_swap,0);
-  temp=conv_root->children[which_child];
-  conv_root->children[which_child]=to_swap->children[which_child];
-  to_swap->children[which_child]=temp;
-  temp=NULL;
-  
-  // swap_child(to_swap,0,to_swap,1);
-  temp=to_swap->children[0];
-  to_swap->children[0]=to_swap->children[1];
-  to_swap->children[1]=temp;
-  temp=NULL;
-
-  // switch (direction) {
-  //   case LEFT:
-  //     // swap_child(conv_root,1,to_swap,1);
-  //     break;
-  //   case RIGHT:
-  //     // swap_child(conv_root,0,to_swap,0);
-  //     temp=(*conv_root)->children[0];
-  //     (*conv_root)->children[0]=(*to_swap)->children[0];
-  //     (*to_swap)->children[0]=temp;
-  //
-  //     break;
-  //   default:
-  //     goto invalid_direction;
-  // }
-  // swap_child(to_swap,0,to_swap,1);
-  
+  to_swap = (conv_root)->children[which_child];
+  swap_keys(root,(void **)&to_swap);
+  swap_child(&conv_root,0,&conv_root,1);
+  swap_child(&conv_root,which_child,&to_swap,which_child);
+  swap_child(&to_swap,0,&to_swap,1);
+ 
   return 0;
-
-invalid_direction:
-  return -1;
 }
 
 void *binary_search(void *root,void *key)
