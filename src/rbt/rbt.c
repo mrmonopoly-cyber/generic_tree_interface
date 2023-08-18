@@ -23,10 +23,26 @@ static int RBT_malloc(rbt **root,void *key,tree_operations *ops,rbt *parent,enum
   }
   (*root)->key=key;
   (*root)->children=malloc(2 * sizeof(*(*root)->children));
+  (*root)->children[0]=NULL;
+  (*root)->children[1]=NULL;
   (*root)->colour=colour;
   (*root)->operations=ops;
   (*root)->parent=parent;
   return 0;
+}
+
+static void reset_parent_after_rotation(rbt *parent,rbt *child,enum ROTATION_DIRECTION dir)
+{
+  int which_child=0;
+  if(dir==LEFT){
+    which_child=1;
+  }
+  if(parent->children[which_child]!=NULL){
+    parent->children[which_child]->parent=parent;
+  }
+  if(child->children[which_child]!=NULL){
+    child->children[which_child]->parent=child;
+  }
 }
 
 static int colour_correction(rbt *child){
@@ -46,34 +62,50 @@ static int colour_correction(rbt *child){
   //child is red , parent is red.
   grandparent = parent->parent;
   uncle = grandparent->children[0];
-  if(uncle == child){
+  if(uncle != child){
     uncle = grandparent->children[1];
   }
   //child red,parent red,uncle red
-  if(uncle->colour==RED){
-    parent->colour==BLACK;
-    uncle->colour==BLACK;
-    parent->parent->colour=RED;
+  if(uncle!=NULL && uncle->colour==RED){
+    parent->colour=BLACK;
+    uncle->colour=BLACK;
+    grandparent->colour=RED;
     return colour_correction(grandparent);
   }
   //child red, parent red, uncle black
-  //left left case (LL)
-  return binary_rotation((void **)&grandparent,RIGHT);
-  //left right case (LR)
-  if(binary_rotation((void **)&parent,LEFT)){
-    goto failed_rotation;
+  //case LR LL 
+  if(grandparent->children[0]!=NULL && grandparent->children[0]==parent){
+    if(parent->children[1]!=NULL && parent->children[1]==child){
+      if(binary_rotation((void **)&parent,LEFT)){
+        goto failed_rotation;
+      }
+      reset_parent_after_rotation(parent,child,RIGHT);
+      return 0;
+    }
+    if(binary_rotation((void **)&grandparent,RIGHT)){
+      goto failed_rotation;
+    }
+    reset_parent_after_rotation(grandparent,parent,LEFT);
+    return 0;
   }
-  return binary_rotation((void **)&grandparent,RIGHT);
-  //right right case (RR)
-  return binary_rotation((void **)&grandparent,LEFT);
-  //right left case (RL)
-  if(binary_rotation((void **)&parent,RIGHT)){
-    goto failed_rotation;
-  }
-  return binary_rotation((void **)&grandparent,LEFT);
 
-   
-  return 0;
+  //case RL RR
+  if(grandparent->children[1]!=NULL && grandparent->children[1]==parent){
+    if(parent->children[0]!=NULL && parent->children[0]==child){
+      if(binary_rotation((void **)&parent,RIGHT)){
+        goto failed_rotation;
+      }
+      reset_parent_after_rotation(parent,child,RIGHT);
+    }
+    if(binary_rotation((void **)&grandparent,LEFT)){
+      goto failed_rotation;
+    }
+    reset_parent_after_rotation(parent,child,LEFT);
+    return 0;
+  }
+
+  //errors
+  return -2;
 failed_rotation:
   return -1;
 }
