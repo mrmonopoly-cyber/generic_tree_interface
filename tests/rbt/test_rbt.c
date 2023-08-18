@@ -25,25 +25,31 @@ int main(int argc, char *argv[])
 {
   tree_operations *env;
   rbt *root=NULL;
-  int dati[] = {10,20,5,2,7,1,4,3,6,9,8,15,13,18,30,29,31};
+  int dati[] = {10,9,8,7,6,11,12,13};
   int num_el = sizeof(dati) / sizeof(dati[0]);
   int rm[] = {10,5,2,13,40,6,1};
   int rm_len = sizeof(rm) / sizeof(rm[0]);
   env = RBT_environment(compare_key,NULL,print_key);
-  
+ 
   //insert
   for (int i=0;i<num_el;++i) {
     RBT_insert(&root,(void *) &dati[i],env);
   }
+  // binary_rotation((void **)&root,RIGHT);
   printf("dopo tutti gli inserimenti\n");
+  printf("pre_order visit\n");
   RBT_pre_order_visit(root);
-
+  printf("in_order visit\n");
+  RBT_in_order_visit(root);
   //delete
   for (int j=0;j<rm_len;++j) {
     RBT_delete(&root,(void *)&rm[j]);
   }
   printf("dopo tutte le eliminazioni\n");
+  printf("pre_order visit\n");
   RBT_pre_order_visit(root);
+  printf("in_order visit\n");
+  RBT_in_order_visit(root);
   
   RBT_free(root);
   root=NULL;
