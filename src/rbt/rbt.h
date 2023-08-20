@@ -5,6 +5,7 @@
 
 typedef struct rbt rbt;
 
+#define RBT_environment(CK,FD,PK) create_environment(CK,FD,PK)
 
 int RBT_insert_full(rbt **root,void *key,rbt *parent,tree_operations *ops);
 #define RBT_insert(root,key,ops) RBT_insert_full(root,key,NULL,ops);
@@ -15,7 +16,6 @@ void RBT_free(rbt *root);
 #define RBT_in_order_visit(R) binary_in_order_visit(R)
 #define RBT_post_order_visit(R) binary_post_order_visit(R)
 
-#define RBT_environment(CK,FD,PK) create_environment(CK,FD,PK)
-
+int valid_rbt(rbt *root);
 
 #endif // !_RBT_
