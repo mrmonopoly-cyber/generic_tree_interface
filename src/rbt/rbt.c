@@ -49,12 +49,12 @@ static int double_rotation(rbt *grandparent,rbt *parent,int index_pr_ch,rbt *chi
                            enum ROTATION_DIRECTION first_rotation,enum ROTATION_DIRECTION second_rotation)
 {
   if(parent->children[index_pr_ch]!=NULL && parent->children[index_pr_ch]==child){
-    if(binary_rotation((void **)&parent,first_rotation)){
+    if(binary_rotation(&parent,first_rotation)){
       goto failed_rotation;
     }
     reset_parent_after_rotation(parent,child,first_rotation);
   }
-  if(binary_rotation((void **)&grandparent,second_rotation)){
+  if(binary_rotation(&grandparent,second_rotation)){
     goto failed_rotation;
   }
   reset_parent_after_rotation(grandparent,parent,second_rotation);

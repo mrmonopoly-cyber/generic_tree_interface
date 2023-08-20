@@ -28,11 +28,11 @@ void binary_pre_order_visit(void *root);
 void binary_in_order_visit(void *root);
 void binary_post_order_visit(void *root);
 
-int binary_rotation(void **root,enum ROTATION_DIRECTION direction);
+int binary_rotation(void *root,enum ROTATION_DIRECTION direction);
 
 void *binary_search(void *root,void *key);
 void binary_free(void *root);
 
-void swap_keys(void **node1,void **node2);
+void swap_keys(void *node1,void *node2);
 
 #endif // _TREE_OPERATIONS_

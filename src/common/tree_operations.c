@@ -60,7 +60,7 @@ void binary_post_order_visit(void *root)
   }
 }
 
-int binary_rotation(void **root, enum ROTATION_DIRECTION direction)
+int binary_rotation(void *root, enum ROTATION_DIRECTION direction)
 {
   int which_child=1;
   common_tree *conv_root = *(common_tree **) root;
@@ -71,7 +71,7 @@ int binary_rotation(void **root, enum ROTATION_DIRECTION direction)
   }
 
   to_swap = (conv_root)->children[which_child];
-  swap_keys(root,(void **)&to_swap);
+  swap_keys(root,&to_swap);
   swap_child(&conv_root,0,&conv_root,1);
   swap_child(&conv_root,which_child,&to_swap,which_child);
   swap_child(&to_swap,0,&to_swap,1);
@@ -114,7 +114,7 @@ void binary_free(void *root)
   }
 }
 
-void swap_keys(void **node1,void **node2)
+void swap_keys(void *node1,void *node2)
 {
   common_tree *node1c = *(common_tree **) node1;
   common_tree *node2c = *(common_tree **) node2;
