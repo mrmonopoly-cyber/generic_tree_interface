@@ -45,7 +45,7 @@ static void reset_parent_after_rotation(rbt *parent,rbt *child,enum ROTATION_DIR
   }
 }
 
-static int double_rotation(rbt *grandparent,int index_gp_ch,rbt *parent,int index_pr_ch,rbt *child,
+static int double_rotation(rbt *grandparent,rbt *parent,int index_pr_ch,rbt *child,
                            enum ROTATION_DIRECTION first_rotation,enum ROTATION_DIRECTION second_rotation)
 {
   if(parent->children[index_pr_ch]!=NULL && parent->children[index_pr_ch]==child){
@@ -93,34 +93,12 @@ static int colour_correction(rbt *child){
 
   //case LR LL 
   if(grandparent->children[0]!=NULL && grandparent->children[0]==parent){
-    return double_rotation(grandparent,0,parent,1,child,LEFT,RIGHT);
-  //   if(parent->children[1]!=NULL && parent->children[1]==child){
-  //     if(binary_rotation((void **)&parent,LEFT)){
-  //       goto failed_rotation;
-  //     }
-  //     reset_parent_after_rotation(parent,child,LEFT);
-  //   }
-  //   if(binary_rotation((void **)&grandparent,RIGHT)){
-  //     goto failed_rotation;
-  //   }
-  //   reset_parent_after_rotation(grandparent,parent,RIGHT);
-  //   return 0;
+    return double_rotation(grandparent,parent,1,child,LEFT,RIGHT);
   }
-  //
+
   // //case RL RR
   if(grandparent->children[1]!=NULL && grandparent->children[1]==parent){
-    return double_rotation(grandparent,1,parent,0,child,RIGHT,LEFT);
-  //   if(parent->children[0]!=NULL && parent->children[0]==child){
-  //     if(binary_rotation((void **)&parent,RIGHT)){
-  //       goto failed_rotation;
-  //     }
-  //     reset_parent_after_rotation(parent,child,RIGHT);
-  //   }
-  //   if(binary_rotation((void **)&grandparent,LEFT)){
-  //     goto failed_rotation;
-  //   }
-  //   reset_parent_after_rotation(grandparent,parent,LEFT);
-  //   return 0;
+    return double_rotation(grandparent,parent,0,child,RIGHT,LEFT);
   }
 
   //errors
