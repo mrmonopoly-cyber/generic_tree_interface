@@ -25,7 +25,7 @@ int main(int argc, char *argv[])
 {
   tree_operations *env;
   rbt *root=NULL;
-  int dati[] = {10,9,8,7,6,11,12,13};
+  int dati[] = {7,5,6,2,3,4,0,-1};
   int num_el = sizeof(dati) / sizeof(dati[0]);
   int rm[] = {10,5,2,13,40,6,1};
   int rm_len = sizeof(rm) / sizeof(rm[0]);
@@ -40,6 +40,9 @@ int main(int argc, char *argv[])
   RBT_pre_order_visit(root);
   printf("in_order visit\n");
   RBT_in_order_visit(root);
+  if(valid_rbt(root)){
+    printf("this is an rbt\n");
+  }
   //delete
   for (int j=0;j<rm_len;++j) {
     RBT_delete(&root,(void *)&rm[j]);
@@ -49,6 +52,10 @@ int main(int argc, char *argv[])
   RBT_pre_order_visit(root);
   printf("in_order visit\n");
   RBT_in_order_visit(root);
+  if(valid_rbt(root)){
+    printf("this is an rbt\n");
+  }
+
   
   RBT_free(root);
   root=NULL;
