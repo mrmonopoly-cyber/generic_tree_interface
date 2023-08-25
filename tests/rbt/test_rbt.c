@@ -2,6 +2,22 @@
 
 #include "rbt.h"
 
+void debug_binary_pre_order_visit(rbt *root)
+{
+  common_tree *t=(common_tree *)root;
+  if(t!=NULL){
+    void *key=t->key;
+    printf("%d\t",*(int *)root->key);
+    if(root->colour==0){
+      printf("BLACK\n");
+    }else {
+      printf("RED\n");
+    }
+    debug_binary_pre_order_visit((void *)t->children[0]);
+    debug_binary_pre_order_visit((void *)t->children[1]);
+  }
+}
+
 int compare_key(void *data1,void *data2)
 {
   int int_data1 = *(int *) data1;
@@ -25,9 +41,9 @@ int main(int argc, char *argv[])
 {
   tree_operations *env;
   rbt *root=NULL;
-  int dati[] = {7,5,6,2,3,4,0,-1};
+  int dati[] = {10,7,14,13,12,15};
   int num_el = sizeof(dati) / sizeof(dati[0]);
-  int rm[] = {10,5,2,13,40,6,1};
+  int rm[] = {10};
   int rm_len = sizeof(rm) / sizeof(rm[0]);
   env = RBT_environment(compare_key,NULL,print_key);
  
@@ -37,7 +53,7 @@ int main(int argc, char *argv[])
   }
   printf("dopo tutti gli inserimenti\n");
   printf("pre_order visit\n");
-  RBT_pre_order_visit(root);
+  debug_binary_pre_order_visit(root);
   printf("in_order visit\n");
   RBT_in_order_visit(root);
   if(valid_rbt(root)){
@@ -49,7 +65,7 @@ int main(int argc, char *argv[])
   }
   printf("dopo tutte le eliminazioni\n");
   printf("pre_order visit\n");
-  RBT_pre_order_visit(root);
+  debug_binary_pre_order_visit(root);
   printf("in_order visit\n");
   RBT_in_order_visit(root);
   if(valid_rbt(root)){
