@@ -3,7 +3,17 @@
 
 #include "tree_operations.h"
 
+enum COLOUR{BLACK,RED };
 typedef struct rbt rbt;
+struct rbt {
+  void *key;
+  struct rbt **children;
+  tree_operations *operations;
+  struct rbt *parent;
+  enum COLOUR colour;
+};
+
+
 
 #define RBT_environment(CK,FD,PK) create_environment(CK,FD,PK)
 

@@ -2,20 +2,23 @@
 
 #include "rbt.h"
 
+//TO REMOVE
+#include <stdio.h>
+
 //private
 
-enum COLOUR{BLACK,RED };
+// enum COLOUR{BLACK,RED };
 
-struct rbt {
-  void *key;
-  struct rbt **children;
-  tree_operations *operations;
-  struct rbt *parent;
-  enum COLOUR colour;
-};
-
+// struct rbt {
+//   void *key;
+//   struct rbt **children;
+//   tree_operations *operations;
+//   struct rbt *parent;
+//   enum COLOUR colour;
+// };
+//
 //functions
-static int RBT_malloc(rbt **root,void *key,tree_operations *ops,rbt *parent,enum COLOUR colour)
+static int RBT_malloc(rbt **root,void *key,tree_operations *ops,rbt *parent)
 {
   (*root)=malloc(sizeof(**root));
   if(*root==NULL){
@@ -25,7 +28,7 @@ static int RBT_malloc(rbt **root,void *key,tree_operations *ops,rbt *parent,enum
   (*root)->children=malloc(2 * sizeof(*(*root)->children));
   (*root)->children[0]=NULL;
   (*root)->children[1]=NULL;
-  (*root)->colour=colour;
+  (*root)->colour=RED;
   (*root)->operations=ops;
   (*root)->parent=parent;
   return 0;
@@ -122,7 +125,7 @@ int RBT_insert_full(rbt **root,void *key,rbt *parent,tree_operations *ops)
     }
   }
   //inserting
-  if(RBT_malloc(root,key,ops,parent,RED)){
+  if(RBT_malloc(root,key,ops,parent)){
     goto failed_malloc;
   }
  
@@ -139,7 +142,86 @@ NULL_pointer:
 
 int RBT_delete(rbt **root,void *key)
 {
-  return 0;
+  if(root==NULL || *root==NULL){
+    goto invalid_pointer;
+  }
+  
+  int is_greater = (*root)->operations->compare_key((*root)->key,key);
+  if(is_greater > 0){
+    return RBT_delete(&(*root)->children[1],key);
+  }else if(is_greater < 0){
+    return RBT_delete(&(*root)->children[0],key);
+  }
+
+  //correct node
+  rbt *root_conv = *root;
+  rbt *parent = root_conv->parent;
+
+  if(root_conv->children[0] == NULL && root_conv->children[1]==NULL ){
+    
+    //root is leaf and root is red 
+    if(root_conv->colour == RED){
+      if(root_conv == parent->children[0]){
+        parent->children[0] = NULL;
+      }else {
+        parent->children[1] = NULL;
+      }
+      RBT_free(root_conv);
+      return 0;
+    }
+
+    //double black node
+    printf("double black case not yes implemented\n");
+    return 0;
+  }
+  
+
+  
+
+  //root is middle node with only right child NULL, child is red
+  rbt *child=NULL;
+  if(root_conv->children[0]!=NULL && root_conv->children[1]==NULL && root_conv->children[0]->colour==RED){
+    child=root_conv->children[0];
+    if(parent->children[0]==root_conv){
+      parent->children[0]=child;
+    }else {
+      parent->children[1]=child;
+    }
+    child->parent=parent;
+    child->colour=BLACK;
+    root_conv->children[0]=NULL;
+    RBT_free(root_conv);
+    return 0;
+  }
+
+  //root is middle node with only left child NULL, child is red
+  if(root_conv->children[0]==NULL && root_conv->children[1]!=NULL && root_conv->children[1]->colour==RED){
+    child=root_conv->children[1];
+    if(parent->children[0]==root_conv){
+      parent->children[0]=child;
+    }else {
+      parent->children[1]=child;
+    }
+    child->parent=parent;
+    child->colour=BLACK;
+    root_conv->children[1]=NULL;
+    RBT_free(root_conv);
+    return 0;
+  }
+  
+  //root is middle and both child exists
+  child=root_conv->children[1];
+  while (child->children[0]!=NULL) {
+    child=child->children[0];
+  }
+  swap_keys(&child,root);
+  return RBT_delete(&child,key);
+  
+
+invalid_pointer:
+  return -1;
+failed_rotation:
+  return -2;
 }
 
 void RBT_free(rbt *root)
