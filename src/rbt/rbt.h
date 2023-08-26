@@ -27,5 +27,6 @@ void RBT_free(rbt *root);
 #define RBT_post_order_visit(R) binary_post_order_visit(R)
 
 int valid_rbt(rbt *root);
+int correct_parents(rbt *root);
 
 #endif // !_RBT_

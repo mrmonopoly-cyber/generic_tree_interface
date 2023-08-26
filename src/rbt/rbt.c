@@ -40,10 +40,10 @@ static void reset_parent_after_rotation(rbt *parent,rbt *child,enum ROTATION_DIR
   if(dir==LEFT){
     which_child=1;
   }
-  if(parent->children[which_child]!=NULL){
+  if(parent != NULL && parent->children[which_child]!=NULL){
     parent->children[which_child]->parent=parent;
   }
-  if(child->children[which_child]!=NULL){
+  if(child!=NULL && child->children[which_child]!=NULL){
     child->children[which_child]->parent=child;
   }
 }
@@ -156,6 +156,7 @@ int RBT_delete(rbt **root,void *key)
   //correct node
   rbt *root_conv = *root;
   rbt *parent = root_conv->parent;
+  rbt *child=NULL;
 
   if(root_conv->children[0] == NULL && root_conv->children[1]==NULL ){
     
@@ -171,15 +172,51 @@ int RBT_delete(rbt **root,void *key)
     }
 
     //double black node
-    printf("double black case not yes implemented\n");
+    rbt *brother;
+    int which_child=0;
+    if(parent->children[which_child] != root_conv){
+      which_child=1;
+    }
+    brother = parent->children[!which_child];
+
+  
+    if(brother->colour==BLACK){
+    RBT_free(root_conv); //creation of dlouble black
+    parent->children[which_child]=NULL;
+      if(which_child ==0){
+        if(brother->children[1]==NULL && brother->children[0]==NULL){
+          brother->colour=RED;
+          return 0;
+        }
+        if(brother->children[1]==NULL && brother->children[0]->colour==RED){
+          binary_rotation(&brother,RIGHT);
+          reset_parent_after_rotation(brother,NULL,RIGHT);
+        }
+        binary_rotation(&parent,LEFT);
+        reset_parent_after_rotation(parent,brother->children[0],LEFT);
+        parent->children[1]->colour=BLACK;
+      }else {
+        if(brother->children[1]==NULL && brother->children[0]==NULL){
+          brother->colour=RED;
+          return 0;
+        }
+        if(brother->children[0]==NULL && brother->children[1]->colour==RED){
+          binary_rotation(&brother,LEFT);
+          reset_parent_after_rotation(brother,NULL,LEFT);
+        }
+        binary_rotation(&parent,RIGHT);
+        reset_parent_after_rotation(parent,brother->children[1],RIGHT);
+        parent->children[0]->colour=BLACK;
+      }
+      return 0;
+    }
+
+
+    printf("not yet implemented\n");
     return 0;
   }
   
-
-  
-
   //root is middle node with only right child NULL, child is red
-  rbt *child=NULL;
   if(root_conv->children[0]!=NULL && root_conv->children[1]==NULL && root_conv->children[0]->colour==RED){
     child=root_conv->children[0];
     if(parent->children[0]==root_conv){
@@ -252,4 +289,27 @@ int valid_rbt(rbt *root)
   }
   return right;
 
+}
+
+int correct_parents(rbt *root)
+{
+  if(root!=NULL){
+    rbt * right = root->children[0];
+    rbt * left = root->children[1];
+
+    if(right != NULL){
+      if(right->parent!=root){
+        return 0;
+      }
+      correct_parents(right);
+    }
+
+    if(left != NULL){
+      if(left->parent!=root){
+        return 0;
+      }
+      correct_parents(left);
+    }
+  }
+  return 1;
 }
