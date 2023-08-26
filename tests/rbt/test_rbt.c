@@ -2,21 +2,6 @@
 
 #include "rbt.h"
 
-void debug_binary_pre_order_visit(rbt *root)
-{
-  common_tree *t=(common_tree *)root;
-  if(t!=NULL){
-    void *key=t->key;
-    printf("%d\t",*(int *)root->key);
-    if(root->colour==0){
-      printf("BLACK\n");
-    }else {
-      printf("RED\n");
-    }
-    debug_binary_pre_order_visit((void *)t->children[0]);
-    debug_binary_pre_order_visit((void *)t->children[1]);
-  }
-}
 
 int compare_key(void *data1,void *data2)
 {
@@ -34,7 +19,7 @@ int compare_key(void *data1,void *data2)
 void print_key(void *key)
 {
   int dig = *(int *)key;
-  printf("%d\n",dig);
+  printf("%d\t",dig);
 }
 
 int main(int argc, char *argv[])
@@ -53,9 +38,10 @@ int main(int argc, char *argv[])
   }
   printf("dopo tutti gli inserimenti\n");
   printf("pre_order visit\n");
-  debug_binary_pre_order_visit(root);
+  RBT_pre_order_visit(root);
   printf("in_order visit\n");
   RBT_in_order_visit(root);
+  printf("\n");
   if(valid_rbt(root)){
     printf("this is an rbt\n");
   }
@@ -68,9 +54,10 @@ int main(int argc, char *argv[])
   }
   printf("dopo tutte le eliminazioni\n");
   printf("pre_order visit\n");
-  debug_binary_pre_order_visit(root);
+  RBT_pre_order_visit(root);
   printf("in_order visit\n");
   RBT_in_order_visit(root);
+  printf("\n");
   if(valid_rbt(root)){
     printf("this is an rbt\n");
   }
