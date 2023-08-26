@@ -41,9 +41,9 @@ int main(int argc, char *argv[])
 {
   tree_operations *env;
   rbt *root=NULL;
-  int dati[] = {10,7,14,13,12,15};
+  int dati[] = {30,20,40,37,35,19,35};
   int num_el = sizeof(dati) / sizeof(dati[0]);
-  int rm[] = {10};
+  int rm[] = {20,40,19};
   int rm_len = sizeof(rm) / sizeof(rm[0]);
   env = RBT_environment(compare_key,NULL,print_key);
  
@@ -59,6 +59,9 @@ int main(int argc, char *argv[])
   if(valid_rbt(root)){
     printf("this is an rbt\n");
   }
+  if(correct_parents(root)){
+    printf("correct parents\n");
+  }
   //delete
   for (int j=0;j<rm_len;++j) {
     RBT_delete(&root,(void *)&rm[j]);
@@ -70,6 +73,10 @@ int main(int argc, char *argv[])
   RBT_in_order_visit(root);
   if(valid_rbt(root)){
     printf("this is an rbt\n");
+  }
+
+  if(correct_parents(root)){
+    printf("correct parents\n");
   }
 
   
