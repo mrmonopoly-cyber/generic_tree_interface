@@ -7,16 +7,16 @@
 
 //private
 
-// enum COLOUR{BLACK,RED };
+enum COLOUR{BLACK,RED };
 
-// struct rbt {
-//   void *key;
-//   struct rbt **children;
-//   tree_operations *operations;
-//   struct rbt *parent;
-//   enum COLOUR colour;
-// };
-//
+struct rbt {
+  void *key;
+  struct rbt **children;
+  tree_operations *operations;
+  struct rbt *parent;
+  enum COLOUR colour;
+};
+
 //functions
 static int RBT_malloc(rbt **root,void *key,tree_operations *ops,rbt *parent)
 {
@@ -179,9 +179,9 @@ int RBT_delete(rbt **root,void *key)
     }
     brother = parent->children[!which_child];
 
+    RBT_free(root_conv); //creation of dlouble black
   
     if(brother->colour==BLACK){
-    RBT_free(root_conv); //creation of dlouble black
     parent->children[which_child]=NULL;
       if(which_child ==0){
         if(brother->children[1]==NULL && brother->children[0]==NULL){
@@ -312,4 +312,19 @@ int correct_parents(rbt *root)
     }
   }
   return 1;
+}
+
+void RBT_pre_order_visit(rbt *root)
+{
+  if(root!=NULL){
+    void *key=root->key;
+    root->operations->print_key(root->key);
+    if(root->colour==0){
+      printf("BLACK\n");
+    }else {
+      printf("RED\n");
+    }
+    RBT_pre_order_visit(root->children[0]);
+    RBT_pre_order_visit(root->children[1]);
+  }
 }
