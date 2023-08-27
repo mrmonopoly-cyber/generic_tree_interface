@@ -1,5 +1,6 @@
 #include <stdio.h>
 
+#define DEBUG
 #include "rbt.h"
 
 
@@ -26,9 +27,9 @@ int main(int argc, char *argv[])
 {
   tree_operations *env;
   rbt *root=NULL;
-  int dati[] = {30,20,40,37,35,19,35};
+  int dati[] = {20,10,35,30,25};
   int num_el = sizeof(dati) / sizeof(dati[0]);
-  int rm[] = {20,40,19};
+  int rm[] = {10};
   int rm_len = sizeof(rm) / sizeof(rm[0]);
   env = RBT_environment(compare_key,NULL,print_key);
  
@@ -49,6 +50,10 @@ int main(int argc, char *argv[])
     printf("correct parents\n");
   }
   //delete
+  set_colour(get_right_child(root),1);
+  set_colour(get_right_child(get_right_child(root)),0);
+  set_colour(get_left_child(get_right_child(root)),0);
+  RBT_pre_order_visit(root);
   for (int j=0;j<rm_len;++j) {
     RBT_delete(&root,(void *)&rm[j]);
   }
