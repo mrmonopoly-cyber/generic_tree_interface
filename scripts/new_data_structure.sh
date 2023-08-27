@@ -50,6 +50,12 @@ do
     sed -i "s/BST/${name_dt^^}/g" tests/$name_dt/test_$name_dt.c
   fi
 
+  if [[ ! -f test/$name_dt/Makefile ]]; then
+    echo "creating Makefile for $name_dt"
+    cp templates/Makefile tests/$name_dt/Makefile
+    sed -i "s/bst/$name_dt/g" tests/$name_dt/Makefile
+  fi
+
   echo "creating links for testing"
   cd tests/$name_dt
   ln -f -s ../../src/$name_dt/$name_dt.h $name_dt.h
