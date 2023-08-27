@@ -2,11 +2,7 @@
 
 #include "rbt.h"
 
-//TO REMOVE
-#include <stdio.h>
-
 //private
-
 enum COLOUR{BLACK,RED };
 
 struct rbt {
@@ -140,6 +136,52 @@ NULL_pointer:
 
 }
 
+static int double_black_brother_red_delete(rbt *brother, rbt *parent, int which_child)
+{
+  enum ROTATION_DIRECTION first_rotation_to_apply = RIGHT;
+  enum ROTATION_DIRECTION second_rotation_to_apply = LEFT;
+  if(which_child != 0){
+    first_rotation_to_apply = LEFT;
+    second_rotation_to_apply = RIGHT;
+  }
+  if(brother->children[1]==NULL && brother->children[0]==NULL){
+    brother->colour=RED;
+    return 0;
+  }
+  if(brother->children[!which_child]==NULL && brother->children[which_child]->colour==RED){
+    if(binary_rotation(&brother,first_rotation_to_apply)){
+      goto failed_rotation;
+    }
+    reset_parent_after_rotation(brother,NULL,first_rotation_to_apply);
+  }
+  if(binary_rotation(&parent,second_rotation_to_apply)){
+    goto failed_rotation;
+  }
+  reset_parent_after_rotation(parent,brother->children[which_child],second_rotation_to_apply);
+  parent->children[!which_child]->colour=BLACK;
+  return 0;
+
+failed_rotation:
+  return -1;
+}
+
+static int double_black_brother_black_delete(rbt *brother, rbt *parent, int which_child)
+{
+  enum ROTATION_DIRECTION rotation = LEFT;
+  if(which_child==1){
+    rotation = RIGHT;
+  }
+  if(binary_rotation(&parent,rotation)){
+    goto failed_rotation;
+  }
+  reset_parent_after_rotation(parent,brother->children[1],rotation);
+  parent->children[which_child]->colour=BLACK;
+  parent->children[which_child]->children[!which_child]->colour=RED;
+  return 0;
+
+failed_rotation:
+  return -1;
+}
 int RBT_delete(rbt **root,void *key)
 {
   if(root==NULL || *root==NULL){
@@ -180,40 +222,14 @@ int RBT_delete(rbt **root,void *key)
     brother = parent->children[!which_child];
 
     RBT_free(root_conv); //creation of dlouble black
+    parent->children[which_child]=NULL;
   
     if(brother->colour==BLACK){
-    parent->children[which_child]=NULL;
-      if(which_child ==0){
-        if(brother->children[1]==NULL && brother->children[0]==NULL){
-          brother->colour=RED;
-          return 0;
-        }
-        if(brother->children[1]==NULL && brother->children[0]->colour==RED){
-          binary_rotation(&brother,RIGHT);
-          reset_parent_after_rotation(brother,NULL,RIGHT);
-        }
-        binary_rotation(&parent,LEFT);
-        reset_parent_after_rotation(parent,brother->children[0],LEFT);
-        parent->children[1]->colour=BLACK;
-      }else {
-        if(brother->children[1]==NULL && brother->children[0]==NULL){
-          brother->colour=RED;
-          return 0;
-        }
-        if(brother->children[0]==NULL && brother->children[1]->colour==RED){
-          binary_rotation(&brother,LEFT);
-          reset_parent_after_rotation(brother,NULL,LEFT);
-        }
-        binary_rotation(&parent,RIGHT);
-        reset_parent_after_rotation(parent,brother->children[1],RIGHT);
-        parent->children[0]->colour=BLACK;
-      }
-      return 0;
+      return double_black_brother_red_delete(brother,parent,which_child);
+    }else {
+      return double_black_brother_black_delete(brother,parent,which_child);
     }
-
-
-    printf("not yet implemented\n");
-    return 0;
+    goto invalid_configuration;
   }
   
   //root is middle node with only right child NULL, child is red
@@ -257,8 +273,8 @@ int RBT_delete(rbt **root,void *key)
 
 invalid_pointer:
   return -1;
-failed_rotation:
-  return -2;
+invalid_configuration:
+  return -3;
 }
 
 void RBT_free(rbt *root)
@@ -314,17 +330,38 @@ int correct_parents(rbt *root)
   return 1;
 }
 
-void RBT_pre_order_visit(rbt *root)
+//debug only
+#include <stdio.h>
+void debug_RBT_pre_order_visit(rbt *root)
 {
   if(root!=NULL){
     void *key=root->key;
-    root->operations->print_key(root->key);
+    root->operations->print_key(key);
     if(root->colour==0){
       printf("BLACK\n");
     }else {
       printf("RED\n");
     }
-    RBT_pre_order_visit(root->children[0]);
-    RBT_pre_order_visit(root->children[1]);
+   debug_RBT_pre_order_visit(root->children[0]);
+   debug_RBT_pre_order_visit(root->children[1]);
   }
+}
+
+void set_colour(rbt *root,int colour)
+{
+ if(colour==0){
+    root->colour=BLACK;
+  }else {
+    root->colour=RED;
+  }
+}
+
+rbt *get_right_child(rbt *root)
+{
+  return root->children[1];
+}
+
+rbt *get_left_child(rbt *root)
+{
+  return root->children[0];
 }
