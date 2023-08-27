@@ -15,8 +15,17 @@ void RBT_free(rbt *root);
 void RBT_pre_order_visit(rbt *root);
 #define RBT_in_order_visit(R) binary_in_order_visit(R)
 #define RBT_post_order_visit(R) binary_post_order_visit(R)
+#define RBT_pre_order_visit(R) binary_pre_order_visit(R)
 
+#ifdef DEBUG
+#undef RBT_pre_order_visit
+void debug_RBT_pre_order_visit(rbt *root);
+#define RBT_pre_order_visit(R) debug_RBT_pre_order_visit(R)
+void set_colour(rbt *root,int colour);
+rbt *get_right_child(rbt *root);
+rbt *get_left_child(rbt *root);
 int valid_rbt(rbt *root);
 int correct_parents(rbt *root);
-
+#endif // DEBUG
+       
 #endif // !_RBT_
