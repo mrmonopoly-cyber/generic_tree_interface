@@ -5,13 +5,10 @@
 typedef struct btree btree;
 
 int BTREE_insert(btree **root,void *key,tree_operations *ops);
-#define BTREE_search(R,K) binary_search(R,K)
+btree *BTREE_search(btree *root,void *key);
 int BTREE_delete(btree **root,void *key);
 void BTREE_free(btree *root);
-#define BTREE_pre_order_visit(R) binary_pre_order_visit(R)
-#define BTREE_in_order_visit(R) binary_in_order_visit(R)
-#define BTREE_post_order_visit(R) binary_post_order_visit(R)
 
-#define BTREE_environment(CK,FK,PK) create_environment(CK,FK,PK)
+#define BTREE_environment(CK,FK,PK,NC) create_environment(CK,FK,PK,NC)
 
 #endif // !_BTREE_TREE_

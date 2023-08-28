@@ -18,12 +18,14 @@ void swap_child(common_tree **node1,int child1, common_tree **node2,int child2)
 //public
 struct tree_operations *create_environment(int (*compare_key) (void *,void*),
                                     void (*free_data) (void *),
-                                    void (*print_key) (void *))
+                                    void (*print_key) (void *),
+                                    int number_of_children)
 {
   struct tree_operations *ops=malloc(sizeof(*ops));
   ops->compare_key=compare_key;
   ops->free_data=free_data;
   ops->print_key=print_key;
+  ops->number_of_children=number_of_children;
   return ops;
 }
 
