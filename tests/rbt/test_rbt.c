@@ -31,7 +31,7 @@ int main(int argc, char *argv[])
   int num_el = sizeof(dati) / sizeof(dati[0]);
   int rm[] = {10};
   int rm_len = sizeof(rm) / sizeof(rm[0]);
-  env = RBT_environment(compare_key,NULL,print_key);
+  env = RBT_environment(compare_key,NULL,print_key,2);
  
   //insert
   for (int i=0;i<num_el;++i) {

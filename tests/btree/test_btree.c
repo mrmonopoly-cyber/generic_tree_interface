@@ -21,7 +21,7 @@ void print_key(void *key)
   printf("%d\n",dig);
 }
 
-int main(int argc, char *argv[])
+int main(void)
 {
   tree_operations *env;
   btree *root=NULL;
@@ -29,7 +29,9 @@ int main(int argc, char *argv[])
   int num_el = sizeof(dati) / sizeof(dati[0]);
   int rm[] = {10,5,2,13,40,6,1};
   int rm_len = sizeof(rm) / sizeof(rm[0]);
-  env = BTREE_environment(compare_key,NULL,print_key);
+  int number_of_children;
+
+  env = BTREE_environment(compare_key,NULL,print_key,number_of_children);
   
   //insert
   for (int i=0;i<num_el;++i) {
