@@ -56,8 +56,8 @@ void binary_post_order_visit(void *root)
   common_tree *t=(common_tree *)root;
   if(t!=NULL){
     void *key=t->key;
-    binary_pre_order_visit((void *)t->children[0]);
-    binary_pre_order_visit((void *)t->children[1]);
+    binary_post_order_visit((void *)t->children[0]);
+    binary_post_order_visit((void *)t->children[1]);
     t->operations->print_key(key);
   }
 }
