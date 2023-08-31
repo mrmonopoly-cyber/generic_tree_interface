@@ -14,7 +14,9 @@ void default_print_key(void *)
 {
   return ;
 }
+
 //public
+
 void swap_child(common_tree **node1,int child1, common_tree **node2,int child2)
 {
   common_tree *child1_p=(*node1)->children[child1];
@@ -138,4 +140,10 @@ void swap_keys(void *node1,void *node2)
   void *temp =  (node1c)->key;
   (node1c)->key=(node2c)->key;
   (node2c)->key=temp;
+}
+
+
+int compare_key(void *node1, void *node2)
+{
+  long *
 }
