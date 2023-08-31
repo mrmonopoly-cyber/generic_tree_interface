@@ -5,6 +5,16 @@
 
 //functions
 
+void default_free_data(void *)
+{
+  return ;
+}
+
+void default_print_key(void *)
+{
+  return ;
+}
+//public
 void swap_child(common_tree **node1,int child1, common_tree **node2,int child2)
 {
   common_tree *child1_p=(*node1)->children[child1];
@@ -15,17 +25,22 @@ void swap_child(common_tree **node1,int child1, common_tree **node2,int child2)
   (*node2)->children[child2]=temp;
 }
 
-//public
 struct tree_operations *create_environment(int (*compare_key) (void *,void*),
                                     void (*free_data) (void *),
                                     void (*print_key) (void *),
-                                    int number_of_children)
+                                    int t)
 {
   struct tree_operations *ops=malloc(sizeof(*ops));
   ops->compare_key=compare_key;
-  ops->free_data=free_data;
-  ops->print_key=print_key;
-  ops->number_of_children=number_of_children;
+  ops->free_data=default_free_data;
+  if(free_data!=NULL){
+    ops->free_data=free_data;
+  }
+  ops->print_key=default_print_key;
+  if(print_key!=NULL){
+    ops->print_key=print_key;
+  }
+  ops->t=t;
   return ops;
 }
 
@@ -56,8 +71,8 @@ void binary_post_order_visit(void *root)
   common_tree *t=(common_tree *)root;
   if(t!=NULL){
     void *key=t->key;
-    binary_post_order_visit((void *)t->children[0]);
-    binary_post_order_visit((void *)t->children[1]);
+    binary_pre_order_visit((void *)t->children[0]);
+    binary_pre_order_visit((void *)t->children[1]);
     t->operations->print_key(key);
   }
 }
