@@ -22,7 +22,6 @@ typedef struct common_tree {
 
 
 tree_operations *create_environment(void (*free_data) (void *),void *other);
-
 void binary_pre_order_visit(void *root);
 void binary_in_order_visit(void *root);
 void binary_post_order_visit(void *root);
