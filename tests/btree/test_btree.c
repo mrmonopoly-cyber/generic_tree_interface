@@ -12,7 +12,7 @@ int main(void)
   int rm_len = sizeof(rm) / sizeof(rm[0]);
   int t = 3;
 
-  env = BTREE_environment(NULL,t);
+  env = BTREE_environment(NULL,&t);
   
   //insert
   for (int i=0;i<num_el;++i) {

@@ -96,9 +96,7 @@ int BTREE_insert(btree **root,void *key,tree_operations *ops)
     set_type_children(*root,1);
 
     minor_child=(*root)->children[0];
-
     greater_child=(*root)->children[1];
-    
 
     new_array_key = (void **)minor_child->keys;
     for (i=1;i<t-1;++i) {
@@ -108,7 +106,7 @@ int BTREE_insert(btree **root,void *key,tree_operations *ops)
     }
 
     new_array_key = (void **)greater_child->keys;
-    for (i=t;i<root_conv->key_num;++i) {
+    for (i=t+1;i<root_conv->key_num;++i) {
       new_array_key[i-(t)]=key_array[i];
       key_array[i]=NULL;
       greater_child->key_num+=1;
@@ -196,7 +194,7 @@ void BTREE_free(btree *root)
   
   if(root!=NULL){
     key_array=(void **)root->keys;
-    for(i-0;i<root->key_num;++i){
+    for(i=0;i<root->key_num;++i){
       // root->operations->free_data(key_array[i]);
     }
     free(root->keys);
@@ -217,13 +215,13 @@ void BTREE_pre_order_visit(btree *root)
   int i=0;
   if(root!=NULL){
     void **key_array=(void **)root->keys;
-    printf("node start\n");
+    printf("node start with length %ld\n",root->key_num);
     for (i=0;i<root->key_num;++i) {
       root->operations->print_key(key_array[i]);
       printf("\n");
     }
     printf("node end\n");
-    for (i=0;i<root->key_num;++i) {
+    for (i=0;i<=root->key_num;++i) {
       if(root->children_type[i]!=NOTHING){
         BTREE_pre_order_visit(root->children[i]);
       }
