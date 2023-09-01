@@ -6,7 +6,7 @@
 //private
 
 //data structure 
-enum NODE_TYPE{LEAF,MIDDLE,NOTHING};
+enum NODE_TYPE{LEAF,MIDDLE};
 
 struct btree{
   void *key;
@@ -36,7 +36,7 @@ static int BTREE_malloc(btree **root,void *key,tree_operations *operations)
   (*root)->children=malloc((2*operations->t) * sizeof(*(*root)->children));
   (*root)->children_type=malloc((2*operations->t) * sizeof(*(*root)->children_type));
   for (int i=0;i<2*operations->t;++i) {
-    (*root)->children_type[i]=NOTHING;
+    (*root)->children_type[i]=LEAF;
   }
   if((*root)->children==NULL){
     goto failed_malloc;
@@ -53,19 +53,21 @@ failed_malloc:
 
 static void insert_key_in_node(btree *root,void *key)
 {
-  void **key_array = (void **) root->keys;
+  long *key_array = (void *) root->keys;
+  btree **children = root->children;
   int i,j,is_greater;
 
   for (i=0;i<root->key_num;++i) {
-  is_greater = root->operations->compare_key(key_array[i],key);
+  is_greater = root->operations->compare_key(&key_array[i],key);
     if(is_greater<=0){
       for (j=(root->key_num)-1;j>=i;--j) {
         key_array[j+1]=key_array[j];
+        children[j+1]=children[j];
       }
       break;
     }
   }
-  key_array[i]=key;
+  key_array[i]=(long)key;
   root->key_num+=1;
 }
 
@@ -74,33 +76,50 @@ static int split_node(btree **new_node,btree *old_node)
   tree_operations *operations = old_node->operations;
   long t =operations->t;
   long index_middle_key = old_node->key_num/2;
-  void **key_array=(void **)old_node->keys;
+  long *key_array=(long *)old_node->keys;
   int i,first_greater;
   btree *greater_child;
-  void **new_array_key;
-  void *old_middle_key= key_array[index_middle_key];
-  void *old_grater_than_middle_key= key_array[index_middle_key+1];
+  long old_middle_key= key_array[index_middle_key];
+  long old_grater_than_middle_key= key_array[index_middle_key+1];
   
   if(*new_node==NULL){
-    if(BTREE_malloc(new_node,old_middle_key,operations)){
+    if(BTREE_malloc(new_node,(void *)old_middle_key,operations)){
       goto failed_malloc;
     }
-
-    key_array[index_middle_key]=NULL;
+    key_array[index_middle_key]=0x0;
     (*new_node)->children[0]=old_node;
-    greater_child=(*new_node)->children[index_middle_key+1];
-  }else {
-  }
 
-  if(BTREE_malloc(&greater_child,old_grater_than_middle_key,operations)){
-    goto failed_malloc;
-  }
-  
-  new_array_key = (void **)greater_child->keys;
+
+    if(BTREE_malloc(&(*new_node)->children[1],(void *)old_grater_than_middle_key,operations)){
+      goto failed_malloc;
+    }
+    greater_child=(*new_node)->children[1];
+    (*new_node)->children_type[0]=MIDDLE;
+    (*new_node)->children_type[1]=MIDDLE;
+
+  }else {
+    insert_key_in_node(*new_node,(void *)old_middle_key);
+    key_array[index_middle_key]=0x0;
+    for (i=0;i<(*new_node)->key_num;++i) {
+      if(((void **)(*new_node)->keys)[i]==(void *)old_middle_key){
+        (*new_node)->children[i]=old_node;
+        greater_child=(*new_node)->children[i+1];
+      }
+    }
+    if(BTREE_malloc(&(*new_node)->children[i+1],(void *)old_grater_than_middle_key,operations)){
+      goto failed_malloc;
+    }
+    (*new_node)->children_type[i]=MIDDLE;
+    (*new_node)->children_type[i+1]=MIDDLE;
+  } 
+
+  old_node->key_num-=2;
+
   first_greater = index_middle_key+2;
   for (i=first_greater;i<(2*t)-1;++i) {
-    new_array_key[i - first_greater] = key_array[i];
+    insert_key_in_node(greater_child,(void *)key_array[i]);
     key_array[i]=0x0;
+    old_node->key_num-=1;
   }
 
   return 0;
@@ -141,7 +160,7 @@ int BTREE_insert(btree **root,void *key,tree_operations *ops)
   //finding where to insert
   key_array = (void **)(*root)->keys;
 
-  if(root_conv->children_type[0]!=NOTHING){ 
+  if(root_conv->children_type[0]!=LEAF){ 
     for (i=0;i<root_conv->key_num;++i) {
       is_greater = (*root)->operations->compare_key(key_array[i],key);
       minor_child = (*root)->children[i];
@@ -235,9 +254,8 @@ void BTREE_pre_order_visit(btree *root)
       root->operations->print_key(key_array[i]);
       printf("\n");
     }
-    printf("node end\n");
     for (i=0;i<=root->key_num;++i) {
-      if(root->children_type[i]!=NOTHING){
+      if(root->children_type[i]!=LEAF){
         BTREE_pre_order_visit(root->children[i]);
       }
     }

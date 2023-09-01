@@ -12,10 +12,6 @@ void BST_free(bst *root);
 #define BST_in_order_visit(R) binary_in_order_visit(R)
 #define BST_post_order_visit(R) binary_post_order_visit(R)
 
-<<<<<<< HEAD
 #define BST_environment(FD,OTHER) create_environment(FD,OTHER)
-=======
-#define BST_environment(CK,FD,PK,T) create_environment(CK,FD,PK,T)
->>>>>>> 09bf441 (adapt BST and RBT code to new standard in environemnt)
 
 #endif // !_BST_TREE_
