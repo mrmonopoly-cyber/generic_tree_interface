@@ -17,7 +17,6 @@ void default_print_key(void *)
 }
 
 //public
-
 void swap_child(common_tree **node1,int child1, common_tree **node2,int child2)
 {
   common_tree *child1_p=(*node1)->children[child1];
@@ -31,11 +30,13 @@ void swap_child(common_tree **node1,int child1, common_tree **node2,int child2)
 struct tree_operations *create_environment(void (*free_data) (void *),void *other)
 {
   struct tree_operations *ops=malloc(sizeof(*ops));
-  ops->free_data=default_free_data;
-  if(free_data!=NULL){
-    ops->free_data=free_data;
-  }
+  ops->compare_key=compare_key;
   ops->other=other;
+  ops->print_key=default_print_key;
+  if(print_key!=NULL){
+    ops->print_key=print_key;
+  }
+  ops->t=t;
   return ops;
 }
 

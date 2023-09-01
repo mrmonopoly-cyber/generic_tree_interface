@@ -44,21 +44,45 @@ static int BTREE_malloc(btree **root,void *key,tree_operations *operations)
   return 0;
 
 invalid_pointer:
-  printf("invalid pointer malloc\n");
+  fprintf(stderr,"invalid pointer malloc\n");
   return -1;
 failed_malloc:
-  printf("failed malloc in BTREE malloc\n");
+  fprintf(stderr,"failed malloc in BTREE malloc\n");
   return -2;
 }
 
-static void set_type_children(btree *root, int child_index)
+static int split_node(btree **new_node,btree *old_node)
 {
-  if(root->children[child_index]->children_type==NULL){
-    root->children_type[child_index]=LEAF;
-  }else {
-    root->children_type[child_index]=MIDDLE;
+  long t =old_node->operations->t;
+  void **key_array=(void **)old_node->keys;
+  int i;
+  btree *minor_child;
+  btree *greater_child;
+  void **new_array_key;
+  
+  minor_child=(*new_node)->children[0];
+  greater_child=(*new_node)->children[(*new_node)->key_num];
+
+  new_array_key = (void **)minor_child->keys;
+  for (i=1;i<t-1;++i) {
+    new_array_key[i]=key_array[i];
+    key_array[i]=NULL;
+    minor_child->key_num+=1;
   }
+
+  new_array_key = (void **)greater_child->keys;
+  for (i=t+1;i<old_node->key_num;++i) {
+    new_array_key[i-(t)]=key_array[i];
+    key_array[i]=NULL;
+    greater_child->key_num+=1;
+  }
+
+  BTREE_free(old_node);
+  old_node=NULL;
+  old_node = *new_node;
+  return 0;
 }
+
 //public
 int BTREE_insert(btree **root,void *key,tree_operations *ops)
 {
@@ -71,6 +95,8 @@ int BTREE_insert(btree **root,void *key,tree_operations *ops)
   }
 
   btree *root_conv = *root;
+  btree *minor_child;
+  btree *greater_child;
   long t =root_conv->operations->t;
   long index_middle_key = (t-1);
   void **key_array=(void **)root_conv->keys;
@@ -79,43 +105,20 @@ int BTREE_insert(btree **root,void *key,tree_operations *ops)
   //split node if it is full
   //root of tree is full
   if(root_conv->key_num==((2*t)-1)){
-    btree *minor_child;
-    btree *greater_child;
-    void **new_array_key;
-
     if(BTREE_malloc(root,key_array[index_middle_key],ops)){
       goto failed_malloc;
     }
-    BTREE_malloc(&(*root)->children[0],key_array[0],ops);
-    BTREE_malloc(&(*root)->children[1],key_array[index_middle_key+1],ops);
-    (*root)->children_type=malloc((2*t) * sizeof(*minor_child->children_type));
+
+    (*root)->children_type=malloc((2*t) * sizeof(*(*root)->children_type));
     if((*root)->children_type == NULL){
       goto failed_malloc;
     }
-    set_type_children(*root,0);
-    set_type_children(*root,1);
+    
+    BTREE_malloc(&(*root)->children[0],key_array[0],ops);
+    BTREE_malloc(&(*root)->children[1],key_array[index_middle_key+1],ops);
 
-    minor_child=(*root)->children[0];
-    greater_child=(*root)->children[1];
-
-    new_array_key = (void **)minor_child->keys;
-    for (i=1;i<t-1;++i) {
-      new_array_key[i]=key_array[i];
-      key_array[i]=NULL;
-      minor_child->key_num+=1;
-    }
-
-    new_array_key = (void **)greater_child->keys;
-    for (i=t+1;i<root_conv->key_num;++i) {
-      new_array_key[i-(t)]=key_array[i];
-      key_array[i]=NULL;
-      greater_child->key_num+=1;
-    }
-
-    BTREE_free(root_conv);
-    root_conv=NULL;
-    root_conv = *root;
-    return 0;
+    split_node(root,root_conv);
+    root_conv=*root;
   }
   
   //middle node of tree is full
@@ -125,20 +128,26 @@ int BTREE_insert(btree **root,void *key,tree_operations *ops)
 
   if(root_conv->children_type[0]!=NOTHING){ 
     for (i=0;i<root_conv->key_num;++i) {
-      is_greater = (*root)->operations->compare_key(key,key_array[i]);
-      btree *minor_child = (*root)->children[i];
-      btree *greater_child = (*root)->children[i+1];
+      is_greater = (*root)->operations->compare_key(key_array[i],key);
+      minor_child = (*root)->children[i];
+      greater_child = (*root)->children[i+1];
       if(is_greater<0){
+        if(minor_child->key_num==(2*t)-1){
+          split_node(root,minor_child);
+        }
         return BTREE_insert(&minor_child,key,ops);
       }else if(is_greater>=0 && i==((*root)->key_num-1)){
+        if(greater_child->key_num==(2*t)-1){
+          split_node(root,minor_child);
+        }
         return BTREE_insert(&greater_child,key,ops);
       }
     }
     goto invalid_case;
   }else { //inserting in leaf
     for (i=0;i<root_conv->key_num;++i) {
-      is_greater = (*root)->operations->compare_key(key,key_array[i]);
-      if(is_greater>=0){
+      is_greater = (*root)->operations->compare_key(key_array[i],key);
+      if(is_greater<=0){
         for (j=(root_conv->key_num)-1;j>=i;--j) {
           key_array[j+1]=key_array[j];
         }
@@ -168,7 +177,7 @@ btree *BTREE_search(btree *root,void *key)
   if(root!=NULL){
     key_array = (void **)root->keys;
     for (i=0;i<root->key_num;++i) {
-      is_greater = root->operations->compare_key(key,key_array[i]);
+      is_greater = root->operations->compare_key(key_array[i],key);
       if(is_greater<0){
         return BTREE_search(root->children[i],key);
       }else if(is_greater>0 && i==(root->key_num-1)){
@@ -195,7 +204,7 @@ void BTREE_free(btree *root)
   if(root!=NULL){
     key_array=(void **)root->keys;
     for(i=0;i<root->key_num;++i){
-      // root->operations->free_data(key_array[i]);
+      root->operations->free_data(key_array[i]);
     }
     free(root->keys);
     for (i=0;i<root->key_num+1;++i) {
