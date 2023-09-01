@@ -2,26 +2,7 @@
 
 #include "bst.h"
 
-int compare_key(void *data1,void *data2)
-{
-  int int_data1 = *(int *) data1;
-  int int_data2 = *(int *) data2;
-  if(int_data1==int_data2){
-    return 0;
-  }
-  if(int_data1>int_data2){
-    return -1;
-  }
-  return 1;
-}
-
-void print_key(void *key)
-{
-  int dig = *(int *)key;
-  printf("%d\n",dig);
-}
-
-int main(int argc, char *argv[])
+int main(void)
 {
   tree_operations *env;
   bst *root=NULL;
@@ -29,7 +10,7 @@ int main(int argc, char *argv[])
   int num_el = sizeof(dati) / sizeof(dati[0]);
   int rm[] = {};
   int rm_len = sizeof(rm) / sizeof(rm[0]);
-  env = BST_environment(compare_key,NULL,print_key);
+  env = BST_environment(NULL,NULL);
   
   //insert
   for (int i=0;i<num_el;++i) {

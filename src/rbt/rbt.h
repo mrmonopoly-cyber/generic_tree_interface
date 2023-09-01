@@ -5,7 +5,7 @@
 
 typedef struct rbt rbt;
 
-#define RBT_environment(CK,FD,PK) create_environment(CK,FD,PK)
+#define RBT_environment(FD,OTHER) create_environment(FD,OTHER)
 
 int RBT_insert_full(rbt **root,void *key,rbt *parent,tree_operations *ops);
 #define RBT_insert(root,key,ops) RBT_insert_full(root,key,NULL,ops);
