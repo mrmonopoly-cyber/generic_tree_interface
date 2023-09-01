@@ -9,7 +9,7 @@
 enum NODE_TYPE{LEAF,MIDDLE};
 
 struct btree{
-  void *key;
+  void *keys;
   struct btree **children;
   struct tree_operations *operations;
   enum NODE_TYPE* children_type;
@@ -22,8 +22,11 @@ static int BTREE_malloc(btree **root,void *key,tree_operations *operations)
   if(root==NULL){
     goto invalid_pointer;
   }
+  
+  void **keys;
+  long t = *(long *)operations->other;
 
-  void **keys = malloc( ((2*operations->t)-1) * sizeof(*keys));
+  keys = malloc( ((2*t)-1) * sizeof(*keys));
   keys[0]=key;
   *root=malloc(sizeof(**root));
   if(*root==NULL){
@@ -33,9 +36,9 @@ static int BTREE_malloc(btree **root,void *key,tree_operations *operations)
   (*root)->key_num=1;
   (*root)->keys=(void *)keys;
   (*root)->operations=operations;
-  (*root)->children=malloc((2*operations->t) * sizeof(*(*root)->children));
-  (*root)->children_type=malloc((2*operations->t) * sizeof(*(*root)->children_type));
-  for (int i=0;i<2*operations->t;++i) {
+  (*root)->children=malloc(2*t * sizeof(*(*root)->children));
+  (*root)->children_type=malloc(2*t * sizeof(*(*root)->children_type));
+  for (int i=0;i<2*t;++i) {
     (*root)->children_type[i]=LEAF;
   }
   if((*root)->children==NULL){
@@ -58,7 +61,7 @@ static void insert_key_in_node(btree *root,void *key)
   int i,j,is_greater;
 
   for (i=0;i<root->key_num;++i) {
-  is_greater = root->operations->compare_key(&key_array[i],key);
+  is_greater = compare_key(&key_array[i],key);
     if(is_greater<=0){
       for (j=(root->key_num)-1;j>=i;--j) {
         key_array[j+1]=key_array[j];
@@ -74,7 +77,7 @@ static void insert_key_in_node(btree *root,void *key)
 static int split_node(btree **new_node,btree *old_node)
 {
   tree_operations *operations = old_node->operations;
-  long t =operations->t;
+  long t =*(long *)operations->other;
   long index_middle_key = old_node->key_num/2;
   long *key_array=(long *)old_node->keys;
   int i,first_greater;
@@ -143,7 +146,7 @@ int BTREE_insert(btree **root,void *key,tree_operations *ops)
   btree *root_conv = *root;
   btree *minor_child;
   btree *greater_child;
-  long t =root_conv->operations->t;
+  long t =*(long *)root_conv->operations->other;
   void **key_array=(void **)root_conv->keys;
   int i,is_greater;
 
@@ -162,7 +165,7 @@ int BTREE_insert(btree **root,void *key,tree_operations *ops)
 
   if(root_conv->children_type[0]!=LEAF){ 
     for (i=0;i<root_conv->key_num;++i) {
-      is_greater = (*root)->operations->compare_key(key_array[i],key);
+      is_greater = compare_key(&key_array[i],key);
       minor_child = (*root)->children[i];
       greater_child = (*root)->children[i+1];
 
@@ -196,20 +199,20 @@ invalid_case:
 
 btree *BTREE_search(btree *root,void *key)
 {
-  void **key_array; 
+  long *key_array; 
   int i,is_greater=0;
 
   if(root!=NULL){
-    key_array = (void **)root->keys;
+    key_array = (long *)root->keys;
     for (i=0;i<root->key_num;++i) {
-      is_greater = root->operations->compare_key(key_array[i],key);
+      is_greater = compare_key(&key_array[i],key);
       if(is_greater<0){
         return BTREE_search(root->children[i],key);
       }else if(is_greater>0 && i==(root->key_num-1)){
         return BTREE_search(root->children[i+1],key);
       }
       if(is_greater==0){
-        return key_array[i];
+        return root;
       }
     }
   }
@@ -248,11 +251,10 @@ void BTREE_pre_order_visit(btree *root)
 {
   int i=0;
   if(root!=NULL){
-    void **key_array=(void **)root->keys;
+    long *key_array=(long *)root->keys;
     printf("node start with length %ld\n",root->key_num);
     for (i=0;i<root->key_num;++i) {
-      root->operations->print_key(key_array[i]);
-      printf("\n");
+      printf("%ld\n",key_array[i]);
     }
     for (i=0;i<=root->key_num;++i) {
       if(root->children_type[i]!=LEAF){

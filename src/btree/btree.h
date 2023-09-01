@@ -5,7 +5,7 @@
 typedef struct btree btree;
 
 int BTREE_insert(btree **root,void *key,tree_operations *ops);
-#define BTREE_search(R,K) binary_search(R,K)
+btree *BTREE_search(btree *root,void *key);
 int BTREE_delete(btree **root,void *key);
 void BTREE_free(btree *root);
 

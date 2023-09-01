@@ -6,13 +6,13 @@ int main(void)
 {
   tree_operations *env;
   btree *root=NULL;
-  int dati[] = {2,3,4,5,6,7,8,9,10};
+  int dati[] = {2,3,4,5,6,7,8,9};
   int num_el = sizeof(dati) / sizeof(dati[0]);
   int rm[] = {};
   int rm_len = sizeof(rm) / sizeof(rm[0]);
-  int t = 3;
+  long t = 3;
 
-  env = BTREE_environment(NULL,t);
+  env = BTREE_environment(NULL,&t);
   
   //insert
   for (int i=0;i<num_el;++i) {
