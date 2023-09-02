@@ -12,6 +12,6 @@ void BST_free(bst *root);
 #define BST_in_order_visit(R) binary_in_order_visit(R)
 #define BST_post_order_visit(R) binary_post_order_visit(R)
 
-#define BST_environment(FD,OTHER) create_environment(FD,OTHER)
+#define BST_environment(CK,PK,FK,OTHER) create_environment(CK,PK,FK,OTHER)
 
 #endif // !_BST_TREE_

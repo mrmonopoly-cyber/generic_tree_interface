@@ -6,18 +6,29 @@
 
 //functions
 
+int default_compare_key(void * node_key, void *key2)
+{
+  long node_key_conv= *(long *) node_key;
+  long key2_conv = *(long *) key2;
+  if(key2_conv < node_key_conv){
+    return -1;
+  }else if (key2_conv > node_key_conv) {
+    return 1;
+  }
+  return 0;
+}
+
 void default_free_data(void *)
 {
   return ;
 }
 
-void default_print_key(void *)
+void default_print_key(void * key)
 {
-  return ;
+  printf("%ld",(long) key);
 }
 
 //public
-
 void swap_child(common_tree **node1,int child1, common_tree **node2,int child2)
 {
   common_tree *child1_p=(*node1)->children[child1];
@@ -28,9 +39,20 @@ void swap_child(common_tree **node1,int child1, common_tree **node2,int child2)
   (*node2)->children[child2]=temp;
 }
 
-struct tree_operations *create_environment(void (*free_data) (void *),void *other)
+struct tree_operations *create_environment(int (*compare_key) (void *,void *), 
+                                           void (*print_key) (void *),
+                                           void (*free_data) (void *),
+                                           void *other)
 {
   struct tree_operations *ops=malloc(sizeof(*ops));
+  ops->compare_key=default_compare_key;
+  if(compare_key!=NULL){
+    ops->compare_key=compare_key;
+  }
+  ops->print_key=default_print_key;
+  if(print_key!=NULL){
+    ops->print_key=print_key;
+  }
   ops->free_data=default_free_data;
   if(free_data!=NULL){
     ops->free_data=free_data;
@@ -44,7 +66,8 @@ void binary_pre_order_visit(void *root)
   common_tree *t=(common_tree *)root;
   if(t!=NULL){
     void *key=t->key;
-    printf("%ld\n",(long)key);
+    t->operations->print_key(key);
+    printf("\n");
     binary_pre_order_visit((void *)t->children[0]);
     binary_pre_order_visit((void *)t->children[1]);
   }
@@ -54,9 +77,10 @@ void binary_in_order_visit(void *root)
 {
   common_tree *t=(common_tree *)root;
   if(t!=NULL){
-    void *key=t->key;
+    void *key = t->key;
+    t->operations->print_key(key);
+    printf("\n");
     binary_in_order_visit((void *)t->children[0]);
-    printf("%ld\n",(long)key);
     binary_in_order_visit((void *)t->children[1]);
   }
 }
@@ -69,6 +93,7 @@ void binary_post_order_visit(void *root)
     binary_pre_order_visit((void *)t->children[0]);
     binary_pre_order_visit((void *)t->children[1]);
     t->operations->print_key(key);
+    printf("\n");
   }
 }
 
@@ -95,8 +120,7 @@ void *binary_search(void *root,void *key)
 {
   common_tree *temp = (common_tree *)root;
   if(temp!=NULL){
-    // int is_greater = temp->operations->compare_key(temp->key,key);
-    int is_greater = compare_key(temp->key,key);
+    int is_greater = temp->operations->compare_key(temp->key,key);
       
     switch (is_greater) {
       case 0:
@@ -134,17 +158,4 @@ void swap_keys(void *node1,void *node2)
   void *temp =  (node1c)->key;
   (node1c)->key=(node2c)->key;
   (node2c)->key=temp;
-}
-
-
-int compare_key(void *root_key, void *key)
-{
-  long root_key_value = (long) root_key;
-  long key_value = (long) key;
-  if(key_value > root_key_value){
-    return 1;
-  }else if (key_value < root_key_value) {
-    return -1;
-  }
-  return 0;
 }

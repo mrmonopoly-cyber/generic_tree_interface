@@ -2,6 +2,23 @@
 
 #include "bst.h"
 
+int compare_key(void *node_key,void *key)
+{
+  int node_key_int = *(int *)node_key;
+  int key_conv = *(int *)key;
+  if(key_conv<node_key_int){
+    return -1;
+  }else if (key_conv>node_key_int) {
+    return 1;
+  }
+  return 0;
+}
+
+void print_key(void * key)
+{
+  printf("%d",*(int *)key);
+}
+
 int main(void)
 {
   tree_operations *env;
@@ -10,7 +27,7 @@ int main(void)
   int num_el = sizeof(dati) / sizeof(dati[0]);
   int rm[] = {};
   int rm_len = sizeof(rm) / sizeof(rm[0]);
-  env = BST_environment(NULL,NULL);
+  env = BST_environment(compare_key,print_key,NULL,NULL);
   
   //insert
   for (int i=0;i<num_el;++i) {
