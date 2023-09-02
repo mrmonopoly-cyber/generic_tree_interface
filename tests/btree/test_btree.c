@@ -23,11 +23,11 @@ int main(void)
 {
   tree_operations *env;
   btree *root=NULL;
-  int dati[] = {2,3,4,5,6,7,8,9,10};
+  int dati[] = {4,3,2,1,0,-1,-2};
   int num_el = sizeof(dati) / sizeof(dati[0]);
   int rm[] = {};
   int rm_len = sizeof(rm) / sizeof(rm[0]);
-  long t = 3;
+  long t = 2;
 
   env = BTREE_environment(compare_key,print_key,NULL,&t);
   

@@ -56,12 +56,12 @@ failed_malloc:
 
 static void insert_key_in_node(btree **root,void *key)
 {
-  long *key_array = (void *) (*root)->keys;
+  void **key_array = (void **) (*root)->keys;
   btree **children = (*root)->children;
   int i,j,is_greater;
 
   for (i=0;i<(*root)->key_num;++i) {
-  is_greater = (*root)->operations->compare_key(&key_array[i],key);
+  is_greater = (*root)->operations->compare_key(key_array[i],key);
     if(is_greater<=0){
       for (j=((*root)->key_num)-1;j>=i;--j) {
         key_array[j+1]=key_array[j];
@@ -70,7 +70,7 @@ static void insert_key_in_node(btree **root,void *key)
       break;
     }
   }
-  key_array[i]=(long)key;
+  key_array[i]=(void *)key;
   (*root)->key_num+=1;
 }
 
@@ -106,6 +106,7 @@ static int split_node(btree **new_node,btree *old_node)
     for (i=0;i<(*new_node)->key_num;++i) {
       if(((void **)(*new_node)->keys)[i]==(void *)old_middle_key){
         (*new_node)->children[i]=old_node;
+        break;
       }
     }
     if(BTREE_malloc(&(*new_node)->children[i+1],(void *)old_grater_than_middle_key,operations)){
@@ -150,7 +151,6 @@ int BTREE_insert(btree **root,void *key,tree_operations *ops)
   void **key_array=(void **)root_conv->keys;
   int i,is_greater;
 
-  //split node if it is full
   //root of tree is full
   if(root_conv->key_num==((2*t)-1)){
     *root=NULL;   
@@ -164,18 +164,18 @@ int BTREE_insert(btree **root,void *key,tree_operations *ops)
   key_array = (void **)(*root)->keys;
 
   for (i=0;i<root_conv->key_num;++i) {
-    is_greater = root_conv->operations->compare_key(&key_array[i],key);
-    minor_child = (*root)->children[i];
-    greater_child = (*root)->children[i+1];
-
-    if(is_greater<0){
-      if(minor_child->key_num==(2*t)-1 && (*root)->children_type[i]!=LEAF){
-        split_node(root,minor_child);
+    is_greater = root_conv->operations->compare_key(key_array[i],key);
+    if((*root)->children_type[i]!=LEAF && is_greater<0){
+      if((*root)->children[i]->key_num==(2*t)-1 ){
+        split_node(root,(*root)->children[i]);
       }
-      return BTREE_insert(&minor_child,key,ops);
+      return BTREE_insert(&(*root)->children[i],key,ops);
     } 
   }
-  if(is_greater>=0 && (*root)->children_type[i]!=LEAF){
+
+  //last child 
+  greater_child = (*root)->children[i];
+  if((*root)->children_type[i]!=LEAF && is_greater>=0){
     if(greater_child->key_num==(2*t)-1){
       split_node(root,greater_child);
     }
