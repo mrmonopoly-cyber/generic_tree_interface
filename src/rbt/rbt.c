@@ -112,8 +112,7 @@ int RBT_insert_full(rbt **root,void *key,rbt *parent,tree_operations *ops)
   }
   //searching 
   if(*root!=NULL){
-    // int is_greater = (*root)->operations->compare_key((*root)->key,key);
-    int is_greater = compare_key((*root)->key,key);
+    int is_greater = (*root)->operations->compare_key((*root)->key,key);
     if(is_greater >= 0){
       return RBT_insert_full(&(*root)->children[1],key,(*root),ops);
     }else {
@@ -189,8 +188,7 @@ int RBT_delete(rbt **root,void *key)
     goto invalid_pointer;
   }
   
-  // int is_greater = (*root)->operations->compare_key((*root)->key,key);
-  int is_greater = compare_key((*root)->key,key);
+  int is_greater = (*root)->operations->compare_key((*root)->key,key);
   if(is_greater > 0){
     return RBT_delete(&(*root)->children[1],key);
   }else if(is_greater < 0){
@@ -337,8 +335,8 @@ int correct_parents(rbt *root)
 void debug_RBT_pre_order_visit(rbt *root)
 {
   if(root!=NULL){
-    void *key=root->key;
-    printf("%ld\n",(long)key);
+    root->operations->print_key(root->key);
+    printf("\t");
     if(root->colour==0){
       printf("BLACK\n");
     }else {

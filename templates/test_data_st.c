@@ -2,30 +2,24 @@
 
 #include "bst.h"
 
-<<<<<<< HEAD
-int main(void)
-=======
-int compare_key(void *root_key,void *key)
+int compare_key(void *node_key,void *key)
 {
-  int int_root_key = *(int *) root_key;
-  int int_key = *(int *) key;
-  if(int_root_key==int_key){
-    return 0;
-  }
-  if(int_key>int_root_key){
+  int node_key_int = *(int *)node_key;
+  int key_conv = *(int *)key;
+  if(key_conv<node_key_int){
+    return -1;
+  }else if (key_conv>node_key_int) {
     return 1;
   }
-  return -1;
+  return 0;
 }
 
-void print_key(void *key)
+void print_key(void * key)
 {
-  int dig = *(int *)key;
-  printf("%d\n",dig);
+  printf("%d",*(int *)key);
 }
 
-int main(int argc, char *argv[])
->>>>>>> 9da5086 (bugfix in BTREE_insert partial implementation, refactored compare_key function in template, tested partial implementation BTREE_insert)
+int main(void)
 {
   tree_operations *env;
   bst *root=NULL;
@@ -33,7 +27,7 @@ int main(int argc, char *argv[])
   int num_el = sizeof(dati) / sizeof(dati[0]);
   int rm[] = {};
   int rm_len = sizeof(rm) / sizeof(rm[0]);
-  env = BST_environment(NULL,NULL);
+  env = BST_environment(compare_key,print_key,NULL,NULL);
   
   //insert
   for (int i=0;i<num_el;++i) {

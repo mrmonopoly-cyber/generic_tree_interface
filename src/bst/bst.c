@@ -34,8 +34,7 @@ int BST_insert(bst **root,void *key,tree_operations *ops)
     return BST_malloc(root,key,ops);
   }
 
-  // int is_greater = (*root)->operations->compare_key((*root)->key,key);
-  int is_greater = compare_key((*root)->key,key);
+  int is_greater = (*root)->operations->compare_key((*root)->key,key);
   if(is_greater >= 0){
     return BST_insert(&(*root)->children[1],key,ops);
   }
@@ -54,8 +53,7 @@ int BST_delete(bst **root,void *key)
   }
   bst *node = *root;
   //searching node
-  // int is_greater = node->operations->compare_key(node->key,key);
-  int is_greater = compare_key((*root)->key,key);
+  int is_greater = node->operations->compare_key(node->key,key);
   if(is_greater > 0){
     return BST_delete(&node->children[1],key);
   }else if(is_greater <0){

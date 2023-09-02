@@ -4,24 +4,24 @@
 #include "rbt.h"
 
 
-// int compare_key(void *data1,void *data2)
-// {
-//   int int_data1 = *(int *) data1;
-//   int int_data2 = *(int *) data2;
-//   if(int_data1==int_data2){
-//     return 0;
-//   }
-//   if(int_data1>int_data2){
-//     return -1;
-//   }
-//   return 1;
-// }
-//
-// void print_key(void *key)
-// {
-//   int dig = *(int *)key;
-//   printf("%d\t",dig);
-// }
+int compare_key(void *data1,void *data2)
+{
+  int int_data1 = *(int *) data1;
+  int int_data2 = *(int *) data2;
+  if(int_data1==int_data2){
+    return 0;
+  }
+  if(int_data1>int_data2){
+    return -1;
+  }
+  return 1;
+}
+
+void print_key(void *key)
+{
+  int dig = *(int *)key;
+  printf("%d",dig);
+}
 
 int main(void)
 {
@@ -31,7 +31,7 @@ int main(void)
   int num_el = sizeof(dati) / sizeof(dati[0]);
   int rm[] = {10};
   int rm_len = sizeof(rm) / sizeof(rm[0]);
-  env = RBT_environment(NULL,NULL);
+  env = RBT_environment(compare_key,print_key,NULL,NULL);
  
   //insert
   for (int i=0;i<num_el;++i) {
