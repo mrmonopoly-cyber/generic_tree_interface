@@ -2,6 +2,23 @@
 
 #include "btree.h"
 
+int compare_key(void *node_key,void *key)
+{
+  int node_key_int = *(int *)node_key;
+  int key_conv = *(int *)key;
+  if(key_conv<node_key_int){
+    return -1;
+  }else if (key_conv>node_key_int) {
+    return 1;
+  }
+  return 0;
+}
+
+void print_key(void * key)
+{
+  printf("%d",*(int *)key);
+}
+
 int main(void)
 {
   tree_operations *env;
@@ -12,7 +29,7 @@ int main(void)
   int rm_len = sizeof(rm) / sizeof(rm[0]);
   long t = 3;
 
-  env = BTREE_environment(NULL,&t);
+  env = BTREE_environment(compare_key,print_key,NULL,&t);
   
   //insert
   for (int i=0;i<num_el;++i) {

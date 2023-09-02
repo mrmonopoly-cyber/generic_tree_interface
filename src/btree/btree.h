@@ -9,7 +9,7 @@ btree *BTREE_search(btree *root,void *key);
 int BTREE_delete(btree **root,void *key);
 void BTREE_free(btree *root);
 
-#define BTREE_environment(FK,OTHER) create_environment(FK,OTHER)
+#define BTREE_environment(CK,PK,FK,OTHER) create_environment(CK,PK,FK,OTHER)
 
 void BTREE_pre_order_visit(btree *root);
 void BTREE_in_order_visit(btree *root);

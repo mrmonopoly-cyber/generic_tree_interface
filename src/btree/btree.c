@@ -61,7 +61,7 @@ static void insert_key_in_node(btree **root,void *key)
   int i,j,is_greater;
 
   for (i=0;i<(*root)->key_num;++i) {
-  is_greater = compare_key(&key_array[i],key);
+  is_greater = (*root)->operations->compare_key(&key_array[i],key);
     if(is_greater<=0){
       for (j=((*root)->key_num)-1;j>=i;--j) {
         key_array[j+1]=key_array[j];
@@ -164,7 +164,7 @@ int BTREE_insert(btree **root,void *key,tree_operations *ops)
   key_array = (void **)(*root)->keys;
 
   for (i=0;i<root_conv->key_num;++i) {
-    is_greater = compare_key(&key_array[i],key);
+    is_greater = root_conv->operations->compare_key(&key_array[i],key);
     minor_child = (*root)->children[i];
     greater_child = (*root)->children[i+1];
 
@@ -200,7 +200,7 @@ btree *BTREE_search(btree *root,void *key)
   if(root!=NULL){
     key_array = (long *)root->keys;
     for (i=0;i<root->key_num;++i) {
-      is_greater = compare_key(&key_array[i],key);
+      is_greater = root->operations->compare_key(&key_array[i],key);
       if(is_greater<0){
         return BTREE_search(root->children[i],key);
       }else if(is_greater>0 && i==(root->key_num-1)){
@@ -250,7 +250,8 @@ void BTREE_pre_order_visit(btree *root)
     key_array=(long *)root->keys;
     printf("node start with length %ld\n",root->key_num);
     for (i=0;i<root->key_num;++i) {
-      printf("key: %ld, data: %d\n",key_array[i],*(int *)key_array[i]);
+      root->operations->print_key((void *)key_array[i]);
+      printf("\n");
     }
     for (i=0;i<=root->key_num;++i) {
       if(root->children_type[i]!=LEAF){
@@ -270,7 +271,8 @@ void BTREE_in_order_visit(btree *root)
       if(root->children_type[i]!=LEAF){
         BTREE_in_order_visit(root->children[i]);
       }
-      printf("key: %ld, data: %d, index: %d\n",key_array[i],*(int *)key_array[i],i);
+      root->operations->print_key((void *)key_array[i]);
+      printf("\n");
     }
     if(root->children_type[i]!=LEAF){
       BTREE_in_order_visit(root->children[i]);
@@ -282,5 +284,20 @@ void BTREE_in_order_visit(btree *root)
 
 void BTREE_post_order_visit(btree *root)
 {
-  return ;
+  int i=0;
+  long *key_array;
+  if(root!=NULL){
+    key_array=(long *)root->keys;
+    for (i=0;i<root->key_num;++i) {
+      root->operations->print_key((void *)key_array[i]);
+      printf("\n");
+      if(root->children_type[i]!=LEAF){
+        BTREE_in_order_visit(root->children[i]);
+      }
+    }
+    if(root->children_type[i]!=LEAF){
+      BTREE_in_order_visit(root->children[i]);
+    }
+
+  }
 }
