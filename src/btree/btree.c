@@ -94,41 +94,31 @@ static int split_node(btree **new_node,btree *old_node)
     if(BTREE_malloc(new_node,(void *)old_middle_key,operations)){
       goto failed_malloc;
     }
-    key_array[index_middle_key]=0x0;
-    (*new_node)->children[0]=old_node;
-
-
-    if(BTREE_malloc(&(*new_node)->children[1],(void *)old_grater_than_middle_key,operations)){
-      goto failed_malloc;
-    }
-    greater_child=(*new_node)->children[1];
-
-    (*new_node)->children_type[0]=MIDDLE;
-    (*new_node)->children_type[1]=MIDDLE;
-
   }else {
     insert_key_in_node(new_node,(void *)old_middle_key);
-    key_array[index_middle_key]=0x0;
-    for (i=0;i<(*new_node)->key_num;++i) {
-      if(((void **)(*new_node)->keys)[i]==(void *)old_middle_key){
-        (*new_node)->children[i]=old_node;
-        break;
-      }
-    }
-    if(BTREE_malloc(&(*new_node)->children[i+1],(void *)old_grater_than_middle_key,operations)){
-      goto failed_malloc;
-    }
-    (*new_node)->children_type[i]=MIDDLE;
-    (*new_node)->children_type[i+1]=MIDDLE;
-    greater_child=(*new_node)->children[i+1];
   } 
-  if(old_node->children_type[index_middle_key+1]!=LEAF){
-    greater_child->children_type[0]=MIDDLE;
-    greater_child->children[0]=old_node->children[index_middle_key+1];
+
+  key_array[index_middle_key]=0x0;
+  for (i=0;i<(*new_node)->key_num;++i) {
+    if(((void **)(*new_node)->keys)[i]==(void *)old_middle_key){
+      (*new_node)->children[i]=old_node;
+      break;
+    }
   }
-  if(old_node->children_type[index_middle_key]!=LEAF){
-    greater_child->children_type[1]=MIDDLE;
-    greater_child->children[1]=old_node->children[index_middle_key+2];
+
+  if(BTREE_malloc(&(*new_node)->children[i+1],(void *)old_grater_than_middle_key,operations)){
+    goto failed_malloc;
+  }
+
+  (*new_node)->children_type[i]=MIDDLE;
+  (*new_node)->children_type[i+1]=MIDDLE;
+  greater_child=(*new_node)->children[i+1];
+
+  for (int j=0;j<2;++j) {
+   if(old_node->children_type[index_middle_key+j]!=LEAF){
+      greater_child->children_type[j]=MIDDLE;
+      greater_child->children[j]=old_node->children[index_middle_key+1+j];
+    }
   }
 
   old_node->key_num-=2;
