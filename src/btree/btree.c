@@ -122,7 +122,6 @@ static int split_node(btree **new_node,btree *old_node)
   }
 
   old_node->key_num-=2;
-
   first_greater = index_middle_key+2;
   for (i=first_greater;i<(2*t)-1;++i) {
     insert_key_in_node(&greater_child,(void *)key_array[i]);
@@ -162,8 +161,6 @@ int BTREE_insert(btree **root,void *key,tree_operations *ops)
     root_conv=(*root);
   }
   
-
-
   //finding where to insert
   key_array = (void **)(*root)->keys;
 
@@ -173,9 +170,12 @@ int BTREE_insert(btree **root,void *key,tree_operations *ops)
     if((*root)->children_type[i]!=LEAF && is_greater<0){
       if(minor_child->key_num==(2*t)-1 ){
         split_node(root,minor_child);
+        is_greater = root_conv->operations->compare_key(key_array[i],key);
         minor_child=root_conv->children[i];
       }
-      return BTREE_insert(&minor_child,key,ops);
+      if(is_greater <0){
+        return BTREE_insert(&minor_child,key,ops);
+      }
     } 
   }
 
@@ -184,7 +184,12 @@ int BTREE_insert(btree **root,void *key,tree_operations *ops)
   if(root_conv->children_type[i]!=LEAF && is_greater>=0){
     if(greater_child->key_num==(2*t)-1){
       split_node(root,greater_child);
-      greater_child=root_conv->children[i+1];
+      is_greater = root_conv->operations->compare_key(key_array[i],key);
+      if(is_greater<0){
+        greater_child=root_conv->children[i];
+      }else {
+        greater_child=root_conv->children[i+1];
+      }
     }
     return BTREE_insert(&greater_child,key,ops);
   }

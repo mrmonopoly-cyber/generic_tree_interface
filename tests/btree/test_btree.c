@@ -23,7 +23,7 @@ int main(void)
 {
   tree_operations *env;
   btree *root=NULL;
-  int dati[] = {10,20,30,40,50,60,70,80,90,100,22,25,30,2,0,1,21};
+  int dati[] = {10,20,30,40,50,60,70,80,90,100,22,25,30,2,0,1,21,110,120,75};
   int num_el = sizeof(dati) / sizeof(dati[0]);
   int rm[] = {};
   int rm_len = sizeof(rm) / sizeof(rm[0]);
