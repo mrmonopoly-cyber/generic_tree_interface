@@ -102,14 +102,6 @@ static int split_node(btree **new_node,btree *old_node)
       goto failed_malloc;
     }
     greater_child=(*new_node)->children[1];
-    if(old_node->children_type[index_middle_key+1]!=LEAF){
-      greater_child->children_type[0]=MIDDLE;
-      greater_child->children[0]=old_node->children[index_middle_key+1];
-    }
-    if(old_node->children_type[index_middle_key]!=LEAF){
-      greater_child->children_type[1]=MIDDLE;
-      greater_child->children[1]=old_node->children[index_middle_key+2];
-    }
 
     (*new_node)->children_type[0]=MIDDLE;
     (*new_node)->children_type[1]=MIDDLE;
@@ -130,6 +122,14 @@ static int split_node(btree **new_node,btree *old_node)
     (*new_node)->children_type[i+1]=MIDDLE;
     greater_child=(*new_node)->children[i+1];
   } 
+  if(old_node->children_type[index_middle_key+1]!=LEAF){
+    greater_child->children_type[0]=MIDDLE;
+    greater_child->children[0]=old_node->children[index_middle_key+1];
+  }
+  if(old_node->children_type[index_middle_key]!=LEAF){
+    greater_child->children_type[1]=MIDDLE;
+    greater_child->children[1]=old_node->children[index_middle_key+2];
+  }
 
   old_node->key_num-=2;
 
