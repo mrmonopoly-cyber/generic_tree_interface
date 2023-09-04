@@ -13,7 +13,7 @@ struct btree{
   struct btree **children;
   struct tree_operations *operations;
   enum NODE_TYPE* children_type;
-  long key_num; //min t-1 max 2t-1
+  long key_num; 
 };
 
 //functions
@@ -54,7 +54,7 @@ failed_malloc:
   return -2;
 }
 
-static void insert_key_in_node(btree **root,void *key)
+static int insert_key_in_node(btree **root,void *key)
 {
   void **key_array = (void **) (*root)->keys;
   btree **children = (*root)->children;
@@ -77,6 +77,7 @@ static void insert_key_in_node(btree **root,void *key)
   }
   key_array[i]=(void *)key;
   (*root)->key_num+=1;
+  return i;
 }
 
 static int split_node(btree **new_node,btree *old_node)
@@ -85,7 +86,9 @@ static int split_node(btree **new_node,btree *old_node)
   long t =*(long *)operations->other;
   long index_middle_key = old_node->key_num/2;
   long *key_array=(long *)old_node->keys;
-  int i,first_greater;
+  int first_greater=0;
+  int index_old_node=0;
+  int j;
   btree *greater_child;
   long old_middle_key= key_array[index_middle_key];
   long old_grater_than_middle_key= key_array[index_middle_key+1];
@@ -95,26 +98,21 @@ static int split_node(btree **new_node,btree *old_node)
       goto failed_malloc;
     }
   }else {
-    insert_key_in_node(new_node,(void *)old_middle_key);
+    index_old_node=insert_key_in_node(new_node,(void *)old_middle_key);
   } 
 
   key_array[index_middle_key]=0x0;
-  for (i=0;i<(*new_node)->key_num;++i) {
-    if(((void **)(*new_node)->keys)[i]==(void *)old_middle_key){
-      (*new_node)->children[i]=old_node;
-      break;
-    }
-  }
+  (*new_node)->children[index_old_node]=old_node;
 
-  if(BTREE_malloc(&(*new_node)->children[i+1],(void *)old_grater_than_middle_key,operations)){
+  if(BTREE_malloc(&(*new_node)->children[index_old_node+1],(void *)old_grater_than_middle_key,operations)){
     goto failed_malloc;
   }
 
-  (*new_node)->children_type[i]=MIDDLE;
-  (*new_node)->children_type[i+1]=MIDDLE;
-  greater_child=(*new_node)->children[i+1];
+  (*new_node)->children_type[index_old_node]=MIDDLE;
+  (*new_node)->children_type[index_old_node+1]=MIDDLE;
+  greater_child=(*new_node)->children[index_old_node+1];
 
-  for (int j=0;j<2;++j) {
+  for (j=0;j<2;++j) {
    if(old_node->children_type[index_middle_key+j]!=LEAF){
       greater_child->children_type[j]=MIDDLE;
       greater_child->children[j]=old_node->children[index_middle_key+1+j];
@@ -123,9 +121,9 @@ static int split_node(btree **new_node,btree *old_node)
 
   old_node->key_num-=2;
   first_greater = index_middle_key+2;
-  for (i=first_greater;i<(2*t)-1;++i) {
-    insert_key_in_node(&greater_child,(void *)key_array[i]);
-    key_array[i]=0x0;
+  for (j=first_greater;j<(2*t)-1;++j) {
+    insert_key_in_node(&greater_child,(void *)key_array[j]);
+    key_array[j]=0x0;
     old_node->key_num-=1;
   }
 
